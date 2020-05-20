@@ -1,0 +1,17 @@
+{
+  "name": "StudentInfo",
+  "displayName": "StudentInfo",
+  "expo": {
+    "name": "StudentInfo",
+    "slug": "StudentInfo",
+    "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
