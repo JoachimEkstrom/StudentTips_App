@@ -4,10 +4,10 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import "react-native-gesture-handler";
 
-import HomeScreen from "./pages/Home";
-import MapScreen from "./pages/MapScreen";
-import NewAccount from "./pages/NewAccount";
-import YourAccount from "./pages/YourAccount";
+import HomeScreen from "./src/pages/Home";
+import MapScreen from "./src/pages/MapScreen";
+import NewAccount from "./src/pages/NewAccount";
+import YourAccount from "./src/pages/YourAccount";
 
 const Stack = createStackNavigator();
 
@@ -18,11 +18,6 @@ const instructions = Platform.select({
 
 export default function App() {
   return (
-    // <View style={styles.container}>
-    //   <Text style={styles.welcome}>Welcome to dfgdfgReact Native!</Text>
-    //   <Text style={styles.instructions}>To get started, edit App.js</Text>
-    //   <Text style={styles.instructions}>{instructions}</Text>
-    // </View>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeScreen} />

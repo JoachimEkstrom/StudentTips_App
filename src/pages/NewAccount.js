@@ -6,7 +6,7 @@ import DataStorage from "../store/store";
 function NewAccount({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+      <Text>Create a new account!</Text>
     </View>
   );
 }
