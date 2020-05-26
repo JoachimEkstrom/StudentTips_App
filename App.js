@@ -3,6 +3,7 @@ import { Platform, StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import "react-native-gesture-handler";
+import * as SplashScreen from "expo-splash-screen";
 
 import HomeScreen from "./src/pages/Home";
 import MapScreen from "./src/pages/MapScreen";

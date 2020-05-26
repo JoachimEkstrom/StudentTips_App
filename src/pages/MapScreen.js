@@ -12,6 +12,7 @@ import { observer } from "mobx-react";
 import DataStorage from "../store/store";
 import { useEffect, useState } from "react";
 import MapboxGL from "@react-native-mapbox-gl/maps";
+import * as Fetching from "../components/fetching";
 
 function MapScreen({ navigation }) {
   const followUserLocation = true;
@@ -21,6 +22,8 @@ function MapScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [openModalVisible, setOpenModalVisible] = useState(false);
   const [LocationName, setLocationName] = useState("");
+  const [TagText, setTagText] = useState("");
+  const [Tags, setTags] = useState([]);
   const [DeleteButton, setDeleteButton] = useState(false);
 
   MapboxGL.setAccessToken(
@@ -37,23 +40,35 @@ function MapScreen({ navigation }) {
     console.log(MapPressed);
     setModalVisible(true);
   }
+  function addtag() {
+    setTags([...Tags, TagText]);
+    setTagText("");
+    console.log(Tags);
+  }
 
-  async function saveNewPin() {
+  function saveNewPin() {
+    let x = String(MapPressed.longitude);
+    let y = String(MapPressed.latitude);
+
     let pin = {
-      title: LocationName,
-      coords: {
-        latitude: MapPressed.latitude,
-        longitude: MapPressed.longitude,
+      pinCoordinates: {
+        y: y,
+        x: x,
       },
-      image: "",
-      tags: ["Bazinga", "Nevada"],
-      addedByUserId: DataStorage.currentUser.userId,
+      pinDescription: "",
+      pinImage: "",
+      pinTags: Tags,
+      pinTitle: LocationName,
+      pinUser: DataStorage.currentUser.userId,
     };
 
+    Fetching.addPinToDb(pin);
     DataStorage.MapPins.push(pin);
     setLocationName("");
+    setTags([]);
+    setTagText("");
     console.log("Saving pin");
-    console.log(pin);
+    // console.log(pin);
   }
 
   function showDeleteButton() {
@@ -77,21 +92,13 @@ function MapScreen({ navigation }) {
   function openPin(index) {
     DataStorage.modalinfo = DataStorage.MapPins[index];
     DataStorage.modalinfo.index = index;
-    console.log("Modal info");
-    console.log(DataStorage.MapPins[index].addedByUserId);
-    console.log("Current user info");
-    console.log(DataStorage.currentUser.userId);
+
     if (
-      DataStorage.currentUser.userId ===
-      DataStorage.MapPins[index].addedByUserId
+      DataStorage.currentUser.userId === DataStorage.MapPins[index].pinUser ||
+      DataStorage.currentUser.isAdmin
     ) {
-      console.log("This is true");
-      setDeleteButton(true);
-    } else if (DataStorage.currentUser.isAdmin) {
-      console.log("This is true");
       setDeleteButton(true);
     } else {
-      console.log("This is false");
       setDeleteButton(false);
     }
     console.log(DeleteButton);
@@ -112,8 +119,8 @@ function MapScreen({ navigation }) {
         <MapboxGL.PointAnnotation
           key={index}
           onSelected={() => openPin(index)}
-          coordinate={[pin.coords.longitude, pin.coords.latitude]}
-          id={pin.title}
+          coordinate={[pin.pinCoordinates.x, pin.pinCoordinates.y]}
+          id={pin.pinTitle}
         ></MapboxGL.PointAnnotation>
       );
     });
@@ -143,12 +150,59 @@ function MapScreen({ navigation }) {
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalText}>Add new Location Pin!</Text>
-            <TextInput
-              style={{ height: 40, borderColor: "gray", borderWidth: 1 }}
-              onChangeText={(text) => setLocationName(text)}
-              value={LocationName}
-            />
 
+            {/* Location name */}
+            <View style={{ flexDirection: "row", justifyContent: "center" }}>
+              <Text style={{ fontSize: 20, textAlign: "center" }}>Name: </Text>
+              <TextInput
+                style={{
+                  height: 40,
+                  width: 80,
+                  borderColor: "gray",
+                  borderWidth: 1,
+                  fontSize: 16,
+                }}
+                onChangeText={(text) => setLocationName(text)}
+                value={LocationName}
+              />
+            </View>
+
+            {/* tags */}
+
+            <View style={{ flexDirection: "row", justifyContent: "center" }}>
+              <Text style={{ fontSize: 20, textAlign: "center" }}>Tags: </Text>
+              <TextInput
+                style={{
+                  height: 40,
+                  width: 80,
+                  borderColor: "gray",
+                  borderWidth: 1,
+                  fontSize: 16,
+                }}
+                onChangeText={(text) => setTagText(text)}
+                value={TagText}
+              />
+              <TouchableHighlight
+                style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+                onPress={() => {
+                  addtag();
+                }}
+              >
+                <Text style={styles.textStyle}>Add tag</Text>
+              </TouchableHighlight>
+            </View>
+            {/* display tags */}
+            <View style={styles.flatlist}>
+              <FlatList
+                data={Tags}
+                renderItem={({ item }) => (
+                  <View>
+                    <Text>{item}</Text>
+                  </View>
+                )}
+                keyExtractor={(item, index) => index.toString()}
+              ></FlatList>
+            </View>
             <TouchableHighlight
               style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
               onPress={() => {
@@ -171,26 +225,28 @@ function MapScreen({ navigation }) {
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalText}>
-              Title: {DataStorage.modalinfo.title}
+              Title: {DataStorage.modalinfo.pinTitle}
             </Text>
             <Text style={styles.modalText}>
-              Latitude: {DataStorage.modalinfo.coords.latitude}
+              Latitude: {DataStorage.modalinfo.pinCoordinates.y}
             </Text>
             <Text style={styles.modalText}>
-              Longitude: {DataStorage.modalinfo.coords.longitude}
+              Longitude: {DataStorage.modalinfo.pinCoordinates.x}
             </Text>
             <Text style={styles.modalText}>
               {/* User: {DataStorage.modalinfo.addedByUserId} */}
             </Text>
-            {/* <FlatList
-              data={DataStorage.modalinfo.tags}
-              renderItem={({ tag }) => (
-                <View>
-                  <Text>{tag}</Text>
-                </View>
-              )}
-            ></FlatList> */}
-
+            <View style={styles.flatlist}>
+              <FlatList
+                data={DataStorage.modalinfo.pinTags}
+                renderItem={({ item }) => (
+                  <View>
+                    <Text>{item}</Text>
+                  </View>
+                )}
+                keyExtractor={(item, index) => index.toString()}
+              ></FlatList>
+            </View>
             {/* Close modal */}
             <TouchableHighlight
               style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
@@ -225,6 +281,9 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  flatlist: {
+    height: 100,
   },
   centeredView: {
     flex: 1,

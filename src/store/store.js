@@ -5,24 +5,26 @@ class DataStorage {
     extendObservable(this, {
       MapPins: [
         {
-          title: "test",
-          coords: {
-            latitude: 36.24246968738326,
-            longitude: -115.0825335134209,
+          pinTitle: "test",
+          pinCoordinates: {
+            y: 36.24246968738326,
+            x: -115.0825335134209,
           },
-          image: "",
-          tags: ["Bazinga", "Nevada"],
-          addedByUserId: 1,
+          pinImage: "",
+          pinTags: ["Bazinga", "Nevada"],
+          pinUser: 1,
+          pinDescription: "",
         },
         {
-          title: "Test2",
-          coords: {
-            latitude: 36.24295547509843,
-            longitude: -115.07727484978403,
+          pinTitle: "Test2",
+          pinCoordinates: {
+            y: 36.24295547509843,
+            x: -115.07727484978403,
           },
-          image: "",
-          tags: ["Las Vegas", "Nevada", "Test2"],
-          addedByUserId: 0,
+          pinImage: "",
+          pinTags: ["Las Vegas", "Nevada", "Test2"],
+          pinUser: 0,
+          pinDescription: "",
         },
       ],
       currentUser: {
@@ -31,14 +33,15 @@ class DataStorage {
         isAdmin: false,
       },
       modalinfo: {
-        title: "",
-        coords: {
-          longitude: 0,
-          latitude: 0,
+        pinTitle: "",
+        pinCoordinates: {
+          x: 0,
+          y: 0,
         },
         index: 0,
         showDeleteButton: false,
       },
+      MapPinsTesting: ["", ""],
     });
   }
 }
