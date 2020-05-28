@@ -1,17 +1,27 @@
 import React from "react";
 import { StyleSheet, Text, View, Button } from "react-native";
 import { observer } from "mobx-react";
-import DataStorage from "../store/store";
 import "react-native-gesture-handler";
 import * as Fetching from "../components/fetching";
 import { useEffect, useState } from "react";
+import * as Location from "expo-location";
 
 function Home({ navigation }) {
+  const [errorMsg, setErrorMsg] = useState(null);
+
   useEffect(() => {
     Fetching.getPins();
+    (async () => {
+      let { status } = await Location.requestPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+      }
+    })();
   }, []);
+
   return (
     <View style={styles.container}>
+      {errorMsg && <Text>{errorMsg}</Text>}
       <Button
         title="Create new Account"
         onPress={() => navigation.navigate("NewAccount")}

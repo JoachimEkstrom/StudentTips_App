@@ -13,15 +13,16 @@ import DataStorage from "../store/store";
 import { useEffect, useState } from "react";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import * as Fetching from "../components/fetching";
+import * as Functions from "../components/Functions";
 
 function MapScreen({ navigation }) {
   const followUserLocation = true;
   const followUserMode = "compass";
-  let map;
   const [MapPressed, setMapPressed] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
   const [openModalVisible, setOpenModalVisible] = useState(false);
-  const [LocationName, setLocationName] = useState("");
+  const [PinTitle, setPinTitle] = useState("");
+  const [PinDescription, setPinDescription] = useState("");
   const [TagText, setTagText] = useState("");
   const [Tags, setTags] = useState([]);
   const [DeleteButton, setDeleteButton] = useState(false);
@@ -37,38 +38,33 @@ function MapScreen({ navigation }) {
       latitude: geometry.coordinates[1],
       longitude: geometry.coordinates[0],
     });
-    console.log(MapPressed);
     setModalVisible(true);
   }
   function addtag() {
     setTags([...Tags, TagText]);
     setTagText("");
-    console.log(Tags);
   }
 
   function saveNewPin() {
-    let x = String(MapPressed.longitude);
-    let y = String(MapPressed.latitude);
-
     let pin = {
       pinCoordinates: {
-        y: y,
-        x: x,
+        y: String(MapPressed.latitude),
+        x: String(MapPressed.longitude),
       },
-      pinDescription: "",
+      pinDescription: PinDescription,
       pinImage: "",
       pinTags: Tags,
-      pinTitle: LocationName,
+      pinTitle: PinTitle,
       pinUser: DataStorage.currentUser.userId,
     };
 
     Fetching.addPinToDb(pin);
     DataStorage.MapPins.push(pin);
-    setLocationName("");
+    setPinTitle("");
+    setPinDescription("");
     setTags([]);
     setTagText("");
     console.log("Saving pin");
-    // console.log(pin);
   }
 
   function showDeleteButton() {
@@ -78,7 +74,10 @@ function MapScreen({ navigation }) {
           style={{ ...styles.openButton, backgroundColor: "#FF2222" }}
           onPress={() => {
             setOpenModalVisible(!openModalVisible);
-            deleteMapPin(DataStorage.modalinfo.index);
+            Functions.deleteMapPin(
+              DataStorage.modalinfo.index,
+              DataStorage.modalinfo.pinId
+            );
           }}
         >
           <Text style={styles.textStyle}>Delete this modal</Text>
@@ -101,16 +100,7 @@ function MapScreen({ navigation }) {
     } else {
       setDeleteButton(false);
     }
-    console.log(DeleteButton);
     setOpenModalVisible(true);
-  }
-
-  function deleteMapPin(index) {
-    console.log("Deleting a Pin");
-    console.log(DataStorage.MapPins);
-
-    DataStorage.MapPins.splice(index, 1);
-    console.log(DataStorage.MapPins);
   }
 
   function renderPins() {
@@ -119,7 +109,10 @@ function MapScreen({ navigation }) {
         <MapboxGL.PointAnnotation
           key={index}
           onSelected={() => openPin(index)}
-          coordinate={[pin.pinCoordinates.x, pin.pinCoordinates.y]}
+          coordinate={[
+            Number(pin.pinCoordinates.x),
+            Number(pin.pinCoordinates.y),
+          ]}
           id={pin.pinTitle}
         ></MapboxGL.PointAnnotation>
       );
@@ -151,9 +144,9 @@ function MapScreen({ navigation }) {
           <View style={styles.modalView}>
             <Text style={styles.modalText}>Add new Location Pin!</Text>
 
-            {/* Location name */}
+            {/* PinTitle */}
             <View style={{ flexDirection: "row", justifyContent: "center" }}>
-              <Text style={{ fontSize: 20, textAlign: "center" }}>Name: </Text>
+              <Text style={{ fontSize: 20, textAlign: "center" }}>Title: </Text>
               <TextInput
                 style={{
                   height: 40,
@@ -162,8 +155,26 @@ function MapScreen({ navigation }) {
                   borderWidth: 1,
                   fontSize: 16,
                 }}
-                onChangeText={(text) => setLocationName(text)}
-                value={LocationName}
+                onChangeText={(text) => setPinTitle(text)}
+                value={PinTitle}
+              />
+            </View>
+
+            {/* PinDescription */}
+            <View style={{ flexDirection: "row", justifyContent: "center" }}>
+              <Text style={{ fontSize: 20, textAlign: "center" }}>
+                Description:{" "}
+              </Text>
+              <TextInput
+                style={{
+                  height: 40,
+                  width: 80,
+                  borderColor: "gray",
+                  borderWidth: 1,
+                  fontSize: 16,
+                }}
+                onChangeText={(text) => setPinDescription(text)}
+                value={PinDescription}
               />
             </View>
 
@@ -257,7 +268,7 @@ function MapScreen({ navigation }) {
               <Text style={styles.textStyle}>close</Text>
             </TouchableHighlight>
 
-            {/* Delete modal  */}
+            {/* Delete pin  */}
 
             {showDeleteButton()}
           </View>

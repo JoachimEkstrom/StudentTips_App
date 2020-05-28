@@ -7,23 +7,12 @@ class DataStorage {
         {
           pinTitle: "test",
           pinCoordinates: {
-            y: 36.24246968738326,
-            x: -115.0825335134209,
+            y: "57.69882110471608",
+            x: "11.977473309244896",
           },
           pinImage: "",
-          pinTags: ["Bazinga", "Nevada"],
+          pinTags: ["Bazinga", "Testing"],
           pinUser: 1,
-          pinDescription: "",
-        },
-        {
-          pinTitle: "Test2",
-          pinCoordinates: {
-            y: 36.24295547509843,
-            x: -115.07727484978403,
-          },
-          pinImage: "",
-          pinTags: ["Las Vegas", "Nevada", "Test2"],
-          pinUser: 0,
           pinDescription: "",
         },
       ],
@@ -41,7 +30,6 @@ class DataStorage {
         index: 0,
         showDeleteButton: false,
       },
-      MapPinsTesting: ["", ""],
     });
   }
 }
