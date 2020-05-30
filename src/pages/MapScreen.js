@@ -128,7 +128,11 @@ function MapScreen({ navigation }) {
       <Text>Maps!!</Text>
 
       <View style={styles.container}>
-        <MapboxGL.MapView onPress={mapPressedFunc} style={styles.map}>
+        <MapboxGL.MapView
+          onPress={mapPressedFunc}
+          style={styles.map}
+          preferredFramesPerSecond={10}
+        >
           <MapboxGL.Camera
             followUserLocation={followUserLocation}
             followUserMode={followUserMode}

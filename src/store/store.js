@@ -14,6 +14,7 @@ class DataStorage {
           pinTags: ["Bazinga", "Testing"],
           pinUser: 1,
           pinDescription: "",
+          pinId: 1,
         },
       ],
       currentUser: {

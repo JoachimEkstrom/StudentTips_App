@@ -32,18 +32,14 @@ async function addPinToDb(pin) {
   return null;
 }
 
-async function patchPinInDb(pin) {
-  console.log(pin);
-  pin = JSON.stringify(pin);
-  console.log(pin);
-
-  await fetch(`http://116.203.125.0:12001/pins/${pin.pinId}`, {
+function patchPinInDb(pin) {
+  fetch(`http://116.203.125.0:12001/pins/` + pin.pinId, {
     method: "PATCH",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    body: pin,
+    body: JSON.stringify(pin),
   }).then((response) => console.log(response.status));
 
   return null;

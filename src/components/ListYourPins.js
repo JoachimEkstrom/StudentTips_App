@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 function ListYourPins(props) {
   return (
     <View style={styles.container}>
-      <Text>One pin FTW!</Text>
       <Text>{props.id}</Text>
       <EditPin pinIndex={props.index}></EditPin>
     </View>

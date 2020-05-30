@@ -21,32 +21,31 @@ function EditPin(props) {
   const [TagText, setTagText] = useState("");
   const [Tags, setTags] = useState([]);
   const [openModalVisible, setOpenModalVisible] = useState(false);
-  const [DeleteButton, setDeleteButton] = useState(false);
 
-  let thisPin = DataStorage.MapPins[props.pinIndex];
+  let copyPin = DataStorage.MapPins[props.pinIndex];
+  let thisPin = JSON.parse(JSON.stringify(copyPin));
+
   useEffect(() => {
     setPinTitle(thisPin.pinTitle);
+    setPinDescription(thisPin.pinDescription);
+    setTags(thisPin.pinTags);
   }, []);
 
   function UpdatePin() {
     let pin = {
       pinCoordinates: {
-        y: String(MapPressed.latitude),
-        x: String(MapPressed.longitude),
+        y: thisPin.pinCoordinates.y,
+        x: thisPin.pinCoordinates.x,
       },
       pinDescription: PinDescription,
       pinImage: "",
       pinTags: Tags,
       pinTitle: PinTitle,
       pinUser: DataStorage.currentUser.userId,
+      pinId: thisPin.pinId,
     };
-
-    Fetching.addPinToDb(pin);
-    DataStorage.MapPins.push(pin);
-    setPinTitle("");
-    setPinDescription("");
-    setTags([]);
-    setTagText("");
+    Fetching.patchPinInDb(pin);
+    Fetching.getPins();
     setOpenModalVisible(!openModalVisible);
   }
 
@@ -79,29 +78,88 @@ function EditPin(props) {
                 value={PinTitle}
               />
             </View>
-
+            <View style={{ flexDirection: "row", justifyContent: "center" }}>
+              <Text style={{ fontSize: 20, textAlign: "center" }}>
+                Description:{" "}
+              </Text>
+              <TextInput
+                style={{
+                  height: 40,
+                  width: 80,
+                  borderColor: "gray",
+                  borderWidth: 1,
+                  fontSize: 16,
+                }}
+                onChangeText={(text) => setPinDescription(text)}
+                value={PinDescription}
+              />
+            </View>
             <Text style={styles.modalText}>
               Latitude: {thisPin.pinCoordinates.y}
             </Text>
             <Text style={styles.modalText}>
               Longitude: {thisPin.pinCoordinates.x}
             </Text>
+
+            {/* Edit Tags */}
             <View style={styles.flatlist}>
               <FlatList
-                data={thisPin.pinTags}
+                data={Tags}
+                extraData={Tags}
                 renderItem={({ item }) => (
                   <View>
                     <Text>{item}</Text>
+                    <TouchableHighlight
+                      style={{
+                        ...styles.openButton,
+                        backgroundColor: "#2196F3",
+                      }}
+                      onPress={() => {
+                        for (let i = 0; i < Tags.length; i++) {
+                          if (item == Tags[i]) {
+                            Tags.splice(i, 1);
+
+                            setTags(JSON.parse(JSON.stringify(Tags)));
+                          }
+                        }
+                      }}
+                    >
+                      <Text style={styles.textStyle}>Delete tag</Text>
+                    </TouchableHighlight>
                   </View>
                 )}
                 keyExtractor={(item, index) => index.toString()}
               ></FlatList>
             </View>
+            <View style={{ flexDirection: "row", justifyContent: "center" }}>
+              <Text style={{ fontSize: 20, textAlign: "center" }}>Tags: </Text>
+              <TextInput
+                style={{
+                  height: 40,
+                  width: 80,
+                  borderColor: "gray",
+                  borderWidth: 1,
+                  fontSize: 16,
+                }}
+                onChangeText={(text) => setTagText(text)}
+                value={TagText}
+              />
+              <TouchableHighlight
+                style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+                onPress={() => {
+                  setTags([...Tags, TagText]);
+                  setTagText("");
+                }}
+              >
+                <Text style={styles.textStyle}>Add tag</Text>
+              </TouchableHighlight>
+            </View>
+
             {/* Update pin */}
             <TouchableHighlight
               style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
               onPress={() => {
-                // UpdatePin();
+                UpdatePin();
               }}
             >
               <Text style={styles.textStyle}>Update pin</Text>
@@ -110,6 +168,9 @@ function EditPin(props) {
             <TouchableHighlight
               style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
               onPress={() => {
+                setPinTitle(thisPin.pinTitle);
+                setPinDescription(thisPin.pinDescription);
+                setTags(copyPin.pinTags);
                 setOpenModalVisible(!openModalVisible);
               }}
             >
