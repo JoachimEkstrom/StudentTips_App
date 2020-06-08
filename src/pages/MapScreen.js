@@ -6,6 +6,7 @@ import {
     View,
     FlatList,
     Modal,
+    Image,
     TouchableHighlight,
 } from "react-native";
 import { useObserver } from "mobx-react-lite";
@@ -13,6 +14,7 @@ import store from "../store/store";
 import { useEffect, useState } from "react";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import * as Fetching from "../components/fetching";
+import ImagePicker from "react-native-image-picker";
 
 function MapScreen({ navigation }) {
     const followUserLocation = true;
@@ -24,9 +26,13 @@ function MapScreen({ navigation }) {
     const [PinDescription, setPinDescription] = useState("");
     const [TagText, setTagText] = useState("");
     const [Tags, setTags] = useState([]);
+    const [Images, setImages] = useState([]);
     const [DeleteButton, setDeleteButton] = useState(false);
+
     let modal = store.getModalinfo;
     let user = store.getCurrentUser;
+    let pinImage;
+
     MapboxGL.setAccessToken(
         "pk.eyJ1IjoianN1bGFiIiwiYSI6ImNrYWY1bmplbjAxNDIyc3E4NmY5NzJzYjkifQ.PJ74G61aNg65BGB06Et3NA"
     );
@@ -47,24 +53,26 @@ function MapScreen({ navigation }) {
 
     function saveNewPin() {
         user = store.getCurrentUser;
-        let pin = {
-            pinCoordinates: {
-                y: String(MapPressed.latitude),
-                x: String(MapPressed.longitude),
-            },
-            pinDescription: PinDescription,
-            pinImage: "",
-            pinTags: Tags,
-            pinTitle: PinTitle,
-            pinUser: user.userId,
-        };
+
+        let pin = new FormData();
+
+        pin.append("pinTitle", PinTitle);
+        pin.append("pinDescription", PinDescription);
+        pin.append("pinImage", Images[0]);
+        pin.append("pinTags", JSON.stringify(Tags));
+        pin.append(
+            "pinCoordinates",
+            JSON.stringify({ x: MapPressed.longitude, y: MapPressed.latitude })
+        );
+        pin.append("pinUser", user.userId);
 
         Fetching.addPinToDb(pin);
-        store.addOneMapPin(pin);
+
         setPinTitle("");
         setPinDescription("");
         setTags([]);
         setTagText("");
+        setImages([]);
         console.log("Saving pin");
     }
 
@@ -88,10 +96,11 @@ function MapScreen({ navigation }) {
         }
     }
 
-    function openPin(index) {
+    async function openPin(index) {
         let pin = store.getMapPins;
         pin = pin[index];
-        store.saveModalInfo(pin, index);
+        pinImage = await Fetching.getPictures(pin);
+        await store.saveModalInfo(pin, index);
         modal = store.getModalinfo;
         user = store.getCurrentUser;
 
@@ -116,10 +125,30 @@ function MapScreen({ navigation }) {
                     ]}
                     id={pin.pinTitle}
                 >
-                    <MapboxGL.Callout title={pin.pinTitle} />
+                    {/* <MapboxGL.Callout title={pin.pinTitle} /> */}
                 </MapboxGL.PointAnnotation>
             );
         });
+    }
+
+    function addImages() {
+        ImagePicker.showImagePicker(
+            { maxWidth: 500, maxHeight: 500 },
+            (response) => {
+                if (response.didCancel) {
+                    return;
+                }
+
+                const image = {
+                    uri: response.uri,
+                    type: response.type,
+                    name:
+                        response.fileName ||
+                        response.uri.substr(response.uri.lastIndexOf("/") + 1),
+                };
+                setImages([...Images, image]);
+            }
+        );
     }
 
     useEffect(() => {
@@ -249,6 +278,23 @@ function MapScreen({ navigation }) {
                                 keyExtractor={(item, index) => index.toString()}
                             ></FlatList>
                         </View>
+
+                        {/* Add picutures */}
+                        <View>
+                            <TouchableHighlight
+                                style={{
+                                    ...styles.openButton,
+                                    backgroundColor: "#2196F3",
+                                }}
+                                onPress={() => {
+                                    addImages();
+                                }}
+                            >
+                                <Text style={styles.textStyle}>
+                                    Add Pictures
+                                </Text>
+                            </TouchableHighlight>
+                        </View>
                         <TouchableHighlight
                             style={{
                                 ...styles.openButton,
@@ -273,7 +319,7 @@ function MapScreen({ navigation }) {
                             }}
                         >
                             <Text style={styles.textStyle}>
-                                close whitour save
+                                Close without save
                             </Text>
                         </TouchableHighlight>
                     </View>
@@ -297,9 +343,6 @@ function MapScreen({ navigation }) {
                         <Text style={styles.modalText}>
                             Longitude: {modal.pinCoordinates.x}
                         </Text>
-                        <Text style={styles.modalText}>
-                            {/* User: {modal.addedByUserId} */}
-                        </Text>
                         <View style={styles.flatlist}>
                             <FlatList
                                 data={modal.pinTags}
@@ -310,6 +353,13 @@ function MapScreen({ navigation }) {
                                 )}
                                 keyExtractor={(item, index) => index.toString()}
                             ></FlatList>
+                        </View>
+                        {/* render images */}
+                        <View>
+                            <Image
+                                source={{ uri: pinImage, scale: 1 }}
+                                style={styles.image}
+                            ></Image>
                         </View>
                         {/* Close modal */}
                         <TouchableHighlight
@@ -347,6 +397,11 @@ const styles = StyleSheet.create({
     },
     flatlist: {
         height: 100,
+    },
+    image: {
+        height: 100,
+        width: 100,
+        resizeMode: "contain",
     },
     centeredView: {
         flex: 1,

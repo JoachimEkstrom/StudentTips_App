@@ -13,7 +13,7 @@ import { useObserver } from "mobx-react-lite";
 import store from "../store/store";
 import { useEffect, useState } from "react";
 import * as Fetching from "../components/fetching";
-import * as Functions from "../components/Functions";
+// import * as Functions from "../components/Functions";
 
 function EditPin(props) {
     const [PinTitle, setPinTitle] = useState("");
@@ -34,20 +34,23 @@ function EditPin(props) {
     }, []);
 
     function UpdatePin() {
-        let pin = {
-            pinCoordinates: {
-                y: thisPin.pinCoordinates.y,
+        let pin = new FormData();
+
+        pin.append("pinTitle", PinTitle);
+        pin.append("pinDescription", PinDescription);
+        pin.append("pinImage", "Bazinga");
+        pin.append("pinTags", JSON.stringify(Tags));
+        pin.append(
+            "pinCoordinates",
+            JSON.stringify({
                 x: thisPin.pinCoordinates.x,
-            },
-            pinDescription: PinDescription,
-            pinImage: "",
-            pinTags: Tags,
-            pinTitle: PinTitle,
-            pinUser: user.userId,
-            pinId: thisPin.pinId,
-        };
-        Fetching.patchPinInDb(pin);
-        Fetching.getPins();
+                y: thisPin.pinCoordinates.y,
+            })
+        );
+        pin.append("pinUser", user.userId);
+        pin.append("pinId", thisPin.pinId);
+
+        Fetching.patchPinInDb(pin, thisPin.pinId);
         setOpenModalVisible(!openModalVisible);
     }
 
