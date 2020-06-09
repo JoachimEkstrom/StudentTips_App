@@ -27,11 +27,10 @@ function MapScreen({ navigation }) {
     const [TagText, setTagText] = useState("");
     const [Tags, setTags] = useState([]);
     const [Images, setImages] = useState([]);
-    const [DeleteButton, setDeleteButton] = useState(false);
 
     let modal = store.getModalinfo;
     let user = store.getCurrentUser;
-    let pinImage;
+    let renderPins = store.getMapPins;
 
     MapboxGL.setAccessToken(
         "pk.eyJ1IjoianN1bGFiIiwiYSI6ImNrYWY1bmplbjAxNDIyc3E4NmY5NzJzYjkifQ.PJ74G61aNg65BGB06Et3NA"
@@ -76,44 +75,18 @@ function MapScreen({ navigation }) {
         console.log("Saving pin");
     }
 
-    function showDeleteButton() {
-        if (DeleteButton) {
-            return (
-                <TouchableHighlight
-                    style={{ ...styles.openButton, backgroundColor: "#FF2222" }}
-                    onPress={() => {
-                        setOpenModalVisible(!openModalVisible);
-                        let modal = store.modalinfo;
-                        Fetching.deletePinInDb(modal.pinId);
-                        store.deleteOneMapPin(modal.index);
-                    }}
-                >
-                    <Text style={styles.textStyle}>Delete this modal</Text>
-                </TouchableHighlight>
-            );
-        } else {
-            return null;
-        }
-    }
-
     async function openPin(index) {
         let pin = store.getMapPins;
-        pin = pin[index];
-        pinImage = await Fetching.getPictures(pin);
+        pin = JSON.parse(JSON.stringify(pin[index]));
+        await Fetching.getPictures(pin);
         await store.saveModalInfo(pin, index);
         modal = store.getModalinfo;
         user = store.getCurrentUser;
 
-        if (user.userId === modal.pinUser || user.isAdmin) {
-            setDeleteButton(true);
-        } else {
-            setDeleteButton(false);
-        }
         setOpenModalVisible(true);
     }
 
-    function renderPins() {
-        let renderPins = store.getMapPins;
+    function renderThePins() {
         return renderPins.map((pin, index) => {
             return (
                 <MapboxGL.PointAnnotation
@@ -124,9 +97,7 @@ function MapScreen({ navigation }) {
                         Number(pin.pinCoordinates.y),
                     ]}
                     id={pin.pinTitle}
-                >
-                    {/* <MapboxGL.Callout title={pin.pinTitle} /> */}
-                </MapboxGL.PointAnnotation>
+                ></MapboxGL.PointAnnotation>
             );
         });
     }
@@ -152,8 +123,8 @@ function MapScreen({ navigation }) {
     }
 
     useEffect(() => {
-        showDeleteButton();
-    }, [DeleteButton]);
+        renderThePins();
+    }, [openModalVisible]);
 
     return useObserver(() => (
         <View style={styles.page}>
@@ -169,7 +140,7 @@ function MapScreen({ navigation }) {
                         followUserLocation={followUserLocation}
                         followUserMode={followUserMode}
                     />
-                    {renderPins()}
+                    {renderThePins()}
 
                     <MapboxGL.UserLocation visible={true} />
                 </MapboxGL.MapView>
@@ -355,12 +326,17 @@ function MapScreen({ navigation }) {
                             ></FlatList>
                         </View>
                         {/* render images */}
-                        <View>
-                            <Image
-                                source={{ uri: pinImage, scale: 1 }}
-                                style={styles.image}
-                            ></Image>
-                        </View>
+                        {modal.pinImage !== null && (
+                            <View>
+                                <Text>{modal.pinImage}</Text>
+                                <Image
+                                    source={{
+                                        uri: modal.pinImage + "?" + Date.now(),
+                                    }}
+                                    style={styles.image}
+                                ></Image>
+                            </View>
+                        )}
                         {/* Close modal */}
                         <TouchableHighlight
                             style={{
@@ -399,8 +375,8 @@ const styles = StyleSheet.create({
         height: 100,
     },
     image: {
-        height: 100,
-        width: 100,
+        height: 200,
+        width: 200,
         resizeMode: "contain",
     },
     centeredView: {

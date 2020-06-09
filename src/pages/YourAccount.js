@@ -1,12 +1,10 @@
 import React, { component } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, ScrollView } from "react-native";
 import { useObserver } from "mobx-react-lite";
 import store from "../store/store";
 import ListYourPins from "../components/ListYourPins";
 
 function YourAccount({ navigation }) {
-    function openPin() {}
-
     function ListPin() {
         let pins = store.getMapPins;
         let user = store.getCurrentUser;
@@ -26,10 +24,10 @@ function YourAccount({ navigation }) {
     }
 
     return useObserver(() => (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <Text>Account page FTW!</Text>
             {ListPin()}
-        </View>
+        </ScrollView>
     ));
 }
 
@@ -37,8 +35,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
     },
 });
 

@@ -9,7 +9,7 @@ async function getPins() {
         .then((result) => {
             for (let i = 0; i < result.length; i++) {
                 pins.push(result[i]);
-                console.log(result[i]);
+                // console.log(result[i]);
             }
         });
 
@@ -19,24 +19,24 @@ async function getPins() {
 }
 
 async function getPictures(pin) {
-    let thisPin = pin;
-    if (thisPin.pinImage == null) return;
+    if (pin.pinImage === null) return;
 
     let dirs = RNFetchBlob.fs.dirs;
+
     RNFetchBlob.config({
         fileCache: true,
-        appendExt: "png",
-        path: dirs.DownloadDir + "/test.png",
+        appendExt: "jpg",
+        path: dirs.DownloadDir + "/temp.jpg",
     })
-        .fetch("GET", thisPin.pinImage)
+        .fetch("GET", pin.pinImage)
         .then((res) => {
-            // the temp file path with file extension `png`
-            console.log("The file saved to ", res.path());
-            thisPin.pinImage = "file://" + res.path();
-            console.log(thisPin.pinImage);
+            let image = "file://" + res.path();
+            store.saveModalImage(image);
+            return;
+        })
+        .catch((errorMessage) => {
+            console.log(errorMessage);
         });
-
-    return thisPin;
 }
 
 async function addPinToDb(pin) {
@@ -76,6 +76,8 @@ async function deletePinInDb(pin) {
     await fetch(`http://116.203.125.0:12001/pins/${pin}`, {
         method: "DELETE",
     }).then((response) => console.log(response.status));
+
+    await getPins();
     return null;
 }
 

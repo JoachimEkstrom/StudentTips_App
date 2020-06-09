@@ -5,7 +5,6 @@ const store = observable({
     get getMapPins() {
         return store.MapPins;
     },
-
     get getModalinfo() {
         return store.modalinfo;
     },
@@ -13,6 +12,7 @@ const store = observable({
         return store.currentUser;
     },
     // Actions
+
     saveMapPins(pins) {
         store.MapPins = pins;
     },
@@ -25,6 +25,9 @@ const store = observable({
     saveModalInfo(pin, index) {
         store.modalinfo = pin;
         store.modalinfo.index = index;
+    },
+    saveModalImage(image) {
+        store.modalinfo.pinImage = image;
     },
     // Data
     MapPins: [

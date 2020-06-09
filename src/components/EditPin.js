@@ -7,13 +7,14 @@ import {
     View,
     FlatList,
     Modal,
+    Image,
     TouchableHighlight,
 } from "react-native";
 import { useObserver } from "mobx-react-lite";
 import store from "../store/store";
 import { useEffect, useState } from "react";
 import * as Fetching from "../components/fetching";
-// import * as Functions from "../components/Functions";
+import ImagePicker from "react-native-image-picker";
 
 function EditPin(props) {
     const [PinTitle, setPinTitle] = useState("");
@@ -21,6 +22,8 @@ function EditPin(props) {
     const [TagText, setTagText] = useState("");
     const [Tags, setTags] = useState([]);
     const [openModalVisible, setOpenModalVisible] = useState(false);
+    const [Img, setImg] = useState([]);
+    const [updated, setupdated] = useState(false);
 
     let copyPin = store.getMapPins;
     copyPin = copyPin[props.pinIndex];
@@ -31,6 +34,7 @@ function EditPin(props) {
         setPinTitle(thisPin.pinTitle);
         setPinDescription(thisPin.pinDescription);
         setTags(thisPin.pinTags);
+        setImg([thisPin.pinImage]);
     }, []);
 
     function UpdatePin() {
@@ -38,7 +42,7 @@ function EditPin(props) {
 
         pin.append("pinTitle", PinTitle);
         pin.append("pinDescription", PinDescription);
-        pin.append("pinImage", "Bazinga");
+        pin.append("pinImage", Img[0]);
         pin.append("pinTags", JSON.stringify(Tags));
         pin.append(
             "pinCoordinates",
@@ -52,6 +56,28 @@ function EditPin(props) {
 
         Fetching.patchPinInDb(pin, thisPin.pinId);
         setOpenModalVisible(!openModalVisible);
+    }
+
+    function updateImage() {
+        ImagePicker.showImagePicker(
+            { maxWidth: 500, maxHeight: 500 },
+            (response) => {
+                if (response.didCancel) {
+                    return;
+                }
+
+                const image = {
+                    uri: response.uri,
+                    type: response.type,
+                    name:
+                        response.fileName ||
+                        response.uri.substr(response.uri.lastIndexOf("/") + 1),
+                };
+
+                setImg([image]);
+                setupdated(true);
+            }
+        );
     }
 
     return useObserver(() => (
@@ -193,6 +219,35 @@ function EditPin(props) {
                                 <Text style={styles.textStyle}>Add tag</Text>
                             </TouchableHighlight>
                         </View>
+                        {thisPin.pinImage !== null && (
+                            <View>
+                                {updated === false && (
+                                    <Image
+                                        source={{ uri: thisPin.pinImage }}
+                                        style={styles.image}
+                                    ></Image>
+                                )}
+                                {updated === true && (
+                                    <Image
+                                        source={{ uri: Img[0].uri }}
+                                        style={styles.image}
+                                    ></Image>
+                                )}
+                                <TouchableHighlight
+                                    style={{
+                                        ...styles.openButton,
+                                        backgroundColor: "#2196F3",
+                                    }}
+                                    onPress={() => {
+                                        updateImage();
+                                    }}
+                                >
+                                    <Text style={styles.textStyle}>
+                                        Change picture
+                                    </Text>
+                                </TouchableHighlight>
+                            </View>
+                        )}
 
                         {/* Update pin */}
                         <TouchableHighlight
@@ -253,6 +308,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         alignItems: "center",
         justifyContent: "center",
+        height: 70,
     },
     modalView: {
         margin: 20,
@@ -292,6 +348,11 @@ const styles = StyleSheet.create({
     },
     flatlist: {
         height: 100,
+    },
+    image: {
+        height: 200,
+        width: 200,
+        resizeMode: "contain",
     },
 });
 
