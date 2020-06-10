@@ -78,7 +78,6 @@ function MapScreen({ navigation }) {
     async function openPin(index) {
         let pin = store.getMapPins;
         pin = JSON.parse(JSON.stringify(pin[index]));
-        await Fetching.getPictures(pin);
         await store.saveModalInfo(pin, index);
         modal = store.getModalinfo;
         user = store.getCurrentUser;
@@ -128,8 +127,6 @@ function MapScreen({ navigation }) {
 
     return useObserver(() => (
         <View style={styles.page}>
-            <Text>Maps!!</Text>
-
             <View style={styles.container}>
                 <MapboxGL.MapView
                     onPress={mapPressedFunc}
@@ -328,10 +325,9 @@ function MapScreen({ navigation }) {
                         {/* render images */}
                         {modal.pinImage !== null && (
                             <View>
-                                <Text>{modal.pinImage}</Text>
                                 <Image
                                     source={{
-                                        uri: modal.pinImage + "?" + Date.now(),
+                                        uri: modal.pinImage,
                                     }}
                                     style={styles.image}
                                 ></Image>
@@ -361,12 +357,13 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#F5FCFF",
+        backgroundColor: "#FCBF49",
     },
     container: {
-        height: 350,
-        width: 350,
+        height: 700,
+        width: 500,
         backgroundColor: "tomato",
+        resizeMode: "contain",
     },
     map: {
         flex: 1,

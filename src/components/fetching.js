@@ -1,5 +1,4 @@
 import store from "../store/store";
-import RNFetchBlob from "react-native-fetch-blob";
 
 async function getPins() {
     let pins = [];
@@ -9,34 +8,13 @@ async function getPins() {
         .then((result) => {
             for (let i = 0; i < result.length; i++) {
                 pins.push(result[i]);
-                // console.log(result[i]);
+                console.log(result[i]);
             }
         });
 
     await store.saveMapPins(pins);
 
     return null;
-}
-
-async function getPictures(pin) {
-    if (pin.pinImage === null) return;
-
-    let dirs = RNFetchBlob.fs.dirs;
-
-    RNFetchBlob.config({
-        fileCache: true,
-        appendExt: "jpg",
-        path: dirs.DownloadDir + "/temp.jpg",
-    })
-        .fetch("GET", pin.pinImage)
-        .then((res) => {
-            let image = "file://" + res.path();
-            store.saveModalImage(image);
-            return;
-        })
-        .catch((errorMessage) => {
-            console.log(errorMessage);
-        });
 }
 
 async function addPinToDb(pin) {
@@ -83,7 +61,6 @@ async function deletePinInDb(pin) {
 
 module.exports = {
     getPins,
-    getPictures,
     addPinToDb,
     patchPinInDb,
     deletePinInDb,

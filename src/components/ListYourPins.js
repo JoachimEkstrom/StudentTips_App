@@ -15,7 +15,7 @@ function ListYourPins(props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#FCBF49",
         alignItems: "center",
         justifyContent: "center",
         height: 75,

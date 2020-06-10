@@ -23,14 +23,17 @@ function Home({ navigation }) {
         <View style={styles.container}>
             {errorMsg && <Text>{errorMsg}</Text>}
             <Button
+                color="#F77F00"
                 title="Create new Account"
                 onPress={() => navigation.navigate("NewAccount")}
             />
             <Button
+                color="#F77F00"
                 title="Your Account"
                 onPress={() => navigation.navigate("YourAccount")}
             />
             <Button
+                color="#F77F00"
                 title="Go to Map page"
                 onPress={() => navigation.navigate("Map")}
             />
@@ -41,7 +44,7 @@ function Home({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#FCBF49",
         alignItems: "center",
         justifyContent: "center",
     },

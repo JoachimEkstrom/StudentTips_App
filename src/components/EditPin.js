@@ -83,6 +83,7 @@ function EditPin(props) {
     return useObserver(() => (
         <View style={styles.container}>
             <Button
+                color="#F77F00"
                 title="Edit this pin"
                 onPress={() => {
                     setOpenModalVisible(true);
@@ -155,7 +156,7 @@ function EditPin(props) {
                                         <TouchableHighlight
                                             style={{
                                                 ...styles.openButton,
-                                                backgroundColor: "#2196F3",
+                                                backgroundColor: "#F77F00",
                                             }}
                                             onPress={() => {
                                                 for (
@@ -209,7 +210,7 @@ function EditPin(props) {
                             <TouchableHighlight
                                 style={{
                                     ...styles.openButton,
-                                    backgroundColor: "#2196F3",
+                                    backgroundColor: "#F77F00",
                                 }}
                                 onPress={() => {
                                     setTags([...Tags, TagText]);
@@ -236,7 +237,7 @@ function EditPin(props) {
                                 <TouchableHighlight
                                     style={{
                                         ...styles.openButton,
-                                        backgroundColor: "#2196F3",
+                                        backgroundColor: "#F77F00",
                                     }}
                                     onPress={() => {
                                         updateImage();
@@ -265,7 +266,7 @@ function EditPin(props) {
                         <TouchableHighlight
                             style={{
                                 ...styles.openButton,
-                                backgroundColor: "#2196F3",
+                                backgroundColor: "#F77F00",
                             }}
                             onPress={() => {
                                 setPinTitle(thisPin.pinTitle);
@@ -283,7 +284,7 @@ function EditPin(props) {
                         <TouchableHighlight
                             style={{
                                 ...styles.openButton,
-                                backgroundColor: "#FF2222",
+                                backgroundColor: "#D62828",
                             }}
                             onPress={() => {
                                 Fetching.deletePinInDb(thisPin.pinId);
@@ -305,7 +306,7 @@ function EditPin(props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#FCBF49",
         alignItems: "center",
         justifyContent: "center",
         height: 70,
