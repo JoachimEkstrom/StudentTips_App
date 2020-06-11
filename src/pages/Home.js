@@ -1,5 +1,5 @@
 import React, { component } from "react";
-import { StyleSheet, Image, TextInput } from "react-native";
+import { StyleSheet, Image, TextInput, ToastAndroid } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Container, Button, Text } from "native-base";
 import { useObserver } from "mobx-react-lite";
@@ -27,6 +27,23 @@ function Home({ navigation }) {
     function resetFields() {
         setUserName("");
         setPassword("");
+    }
+
+    async function loginUser() {
+        let user = {
+            userName: UserName,
+            userPassword: Password,
+        };
+
+        let message = await Fetching.login(user);
+        showToast(message.message);
+        if (message.loggedIn === true) {
+            resetFields();
+            navigation.navigate("Map");
+        }
+    }
+    function showToast(message) {
+        ToastAndroid.show(message, ToastAndroid.SHORT);
     }
 
     return useObserver(() => (
@@ -58,8 +75,7 @@ function Home({ navigation }) {
                     rounded
                     color="#F77F00"
                     onPress={() => {
-                        resetFields();
-                        navigation.navigate("Map");
+                        loginUser();
                     }}
                 >
                     <Text>Login!</Text>
@@ -75,14 +91,6 @@ function Home({ navigation }) {
                 >
                     <Text>Create new account!</Text>
                 </Button>
-                {/* <Button
-                style={{ marginTop: 10 }}
-                rounded
-                color="#F77F00"
-                onPress={() => navigation.navigate("YourAccount")}
-            >
-                <Text>Your profile</Text>
-            </Button> */}
                 <Container style={{ margin: 50 }}></Container>
             </Container>
         </KeyboardAwareScrollView>

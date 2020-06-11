@@ -63,9 +63,9 @@ function MapScreen({ navigation }) {
             "pinCoordinates",
             JSON.stringify({ x: MapPressed.longitude, y: MapPressed.latitude })
         );
-        pin.append("pinUser", user.userId);
+        pin.append("pinUser", user.userName);
 
-        Fetching.addPinToDb(pin);
+        Fetching.addPinToDb(pin, user.token);
 
         setPinTitle("");
         setPinDescription("");
@@ -122,8 +122,9 @@ function MapScreen({ navigation }) {
     }
 
     useEffect(() => {
+        renderPins = store.getMapPins;
         renderThePins();
-    }, [openModalVisible]);
+    }, [openModalVisible, modalVisible]);
 
     return useObserver(() => (
         <View style={styles.page}>
@@ -283,6 +284,7 @@ function MapScreen({ navigation }) {
                                 backgroundColor: "#2196F3",
                             }}
                             onPress={() => {
+                                setImages([]);
                                 setModalVisible(!modalVisible);
                             }}
                         >

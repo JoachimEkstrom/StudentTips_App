@@ -29,6 +29,12 @@ const store = observable({
     saveModalImage(image) {
         store.modalinfo.pinImage = image;
     },
+    userLoggedIn(user) {
+        store.currentUser = user;
+    },
+    userLoggedOut(user) {
+        store.currentUser = user;
+    },
     // Data
     MapPins: [
         {
@@ -45,9 +51,9 @@ const store = observable({
         },
     ],
     currentUser: {
-        userName: "Berra",
-        userId: 1,
-        isAdmin: false,
+        userName: "",
+        token: "",
+        userId: "",
     },
     modalinfo: {
         pinTitle: "",
@@ -63,10 +69,5 @@ const store = observable({
         index: 0,
     },
 });
-
-// // Reaction
-// reaction(() => {
-//     return store.MapPins;
-// });
 
 export default store;
