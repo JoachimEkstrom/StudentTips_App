@@ -1,7 +1,7 @@
 import React, { component } from "react";
 import { StyleSheet, Image, TextInput, ToastAndroid } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Container, Button, Text } from "native-base";
+import { Container, Button, Text, Icon } from "native-base";
 import { useObserver } from "mobx-react-lite";
 import "react-native-gesture-handler";
 import * as Fetching from "../components/fetching";
@@ -47,7 +47,11 @@ function Home({ navigation }) {
     }
 
     return useObserver(() => (
-        <KeyboardAwareScrollView enableOnAndroid={true} extraScrollHeight={200}>
+        <KeyboardAwareScrollView
+            enableOnAndroid={true}
+            extraScrollHeight={200}
+            keyboardShouldPersistTaps="always"
+        >
             <Container style={styles.container}>
                 {errorMsg && <Text>{errorMsg}</Text>}
                 <Image source={Logo} style={styles.image}></Image>
@@ -71,6 +75,8 @@ function Home({ navigation }) {
                     />
                 </Container>
                 <Button
+                    iconLeft
+                    primary
                     style={{ marginTop: 10 }}
                     rounded
                     color="#F77F00"
@@ -78,9 +84,12 @@ function Home({ navigation }) {
                         loginUser();
                     }}
                 >
+                    <Icon name="paper-plane" />
                     <Text>Login!</Text>
                 </Button>
                 <Button
+                    iconLeft
+                    primary
                     style={{ marginTop: 10 }}
                     rounded
                     color="#F77F00"
@@ -89,6 +98,7 @@ function Home({ navigation }) {
                         navigation.navigate("NewAccount");
                     }}
                 >
+                    <Icon name="person-add" />
                     <Text>Create new account!</Text>
                 </Button>
                 <Container style={{ margin: 50 }}></Container>

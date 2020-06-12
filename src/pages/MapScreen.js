@@ -12,6 +12,7 @@ import {
 import { useObserver } from "mobx-react-lite";
 import store from "../store/store";
 import { useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import MapboxGL from "@react-native-mapbox-gl/maps";
 import * as Fetching from "../components/fetching";
 import ImagePicker from "react-native-image-picker";
@@ -26,7 +27,7 @@ function MapScreen({ navigation }) {
     const [PinDescription, setPinDescription] = useState("");
     const [TagText, setTagText] = useState("");
     const [Tags, setTags] = useState([]);
-    const [Images, setImages] = useState([]);
+    const [PinImage, setPinImage] = useState(null);
 
     let modal = store.getModalinfo;
     let user = store.getCurrentUser;
@@ -50,28 +51,27 @@ function MapScreen({ navigation }) {
         setTagText("");
     }
 
-    function saveNewPin() {
+    async function saveNewPin() {
         user = store.getCurrentUser;
 
         let pin = new FormData();
 
         pin.append("pinTitle", PinTitle);
         pin.append("pinDescription", PinDescription);
-        pin.append("pinImage", Images[0]);
+        pin.append("pinImage", PinImage);
         pin.append("pinTags", JSON.stringify(Tags));
         pin.append(
             "pinCoordinates",
             JSON.stringify({ x: MapPressed.longitude, y: MapPressed.latitude })
         );
-        pin.append("pinUser", user.userName);
 
-        Fetching.addPinToDb(pin, user.token);
+        await Fetching.addPinToDb(pin, user.token);
 
         setPinTitle("");
         setPinDescription("");
         setTags([]);
         setTagText("");
-        setImages([]);
+        setPinImage(null);
         console.log("Saving pin");
     }
 
@@ -86,6 +86,7 @@ function MapScreen({ navigation }) {
     }
 
     function renderThePins() {
+        renderPins = store.getMapPins;
         return renderPins.map((pin, index) => {
             return (
                 <MapboxGL.PointAnnotation
@@ -116,13 +117,15 @@ function MapScreen({ navigation }) {
                         response.fileName ||
                         response.uri.substr(response.uri.lastIndexOf("/") + 1),
                 };
-                setImages([...Images, image]);
+                setPinImage(image);
             }
         );
     }
+    useFocusEffect(() => {
+        renderThePins();
+    });
 
     useEffect(() => {
-        renderPins = store.getMapPins;
         renderThePins();
     }, [openModalVisible, modalVisible]);
 
@@ -247,6 +250,17 @@ function MapScreen({ navigation }) {
                                 keyExtractor={(item, index) => index.toString()}
                             ></FlatList>
                         </View>
+                        {/* render images */}
+                        {PinImage !== null && (
+                            <View>
+                                <Image
+                                    source={{
+                                        uri: PinImage.uri,
+                                    }}
+                                    style={styles.image}
+                                ></Image>
+                            </View>
+                        )}
 
                         {/* Add picutures */}
                         <View>
@@ -284,7 +298,7 @@ function MapScreen({ navigation }) {
                                 backgroundColor: "#2196F3",
                             }}
                             onPress={() => {
-                                setImages([]);
+                                setPinImage(null);
                                 setModalVisible(!modalVisible);
                             }}
                         >

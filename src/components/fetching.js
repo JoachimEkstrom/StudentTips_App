@@ -1,4 +1,36 @@
 import store from "../store/store";
+import { AsyncStorage } from "react-native";
+
+async function setToken(token, userId) {
+    try {
+        console.log(token);
+        await AsyncStorage.setItem("Token", token);
+        await AsyncStorage.setItem("userId", userId);
+        console.log(token);
+        console.log(userId);
+    } catch (error) {
+        console.log("Error in Async storage, setToken");
+        console.log(error);
+    }
+}
+async function getToken(user) {
+    let token;
+    let userId;
+    try {
+        token = await AsyncStorage.getItem("Token");
+        userId = await AsyncStorage.getItem("userId");
+        console.log("Getting Token");
+        console.log(token);
+        store.userLoggedIn({
+            userName: user.userName,
+            token: token,
+            userId: Number(userId),
+        });
+    } catch (error) {
+        console.log("Error in Async storage, getToken");
+        console.log(error);
+    }
+}
 
 async function getPins() {
     let pins = [];
@@ -28,7 +60,7 @@ async function addPinToDb(pin, token) {
             Token: token,
         },
         body: pin,
-    }).then((response) => console.log(response));
+    }).then((response) => console.log(response.status));
 
     await getPins();
 
@@ -43,7 +75,7 @@ async function patchPinInDb(pin, index) {
             "Content-Type": "multipart/form-data",
         },
         body: pin,
-    }).then((response) => console.log(response));
+    }).then((response) => console.log(response.status));
 
     await getPins();
 
@@ -104,12 +136,17 @@ async function login(user) {
             message.message = result.message;
             console.log(result);
 
-            if (result.status === 1 || result.status === 3) {
+            if (result.status === 1) {
                 store.userLoggedIn({
                     userName: user.userName,
                     token: result.token,
-                    // userId: result.userId,
+                    userId: result.user,
                 });
+                setToken(result.token, String(result.user));
+                message.loggedIn = true;
+            } else if (result.status === 3) {
+                getToken(user);
+
                 message.loggedIn = true;
             }
             console.log(message);
@@ -134,6 +171,7 @@ async function logout(token) {
                     token: "",
                     userId: "",
                 });
+                setToken("", "");
                 message.loggedOut = true;
             }
         });

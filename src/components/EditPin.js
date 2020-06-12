@@ -341,12 +341,6 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         textAlign: "center",
     },
-    openButton: {
-        backgroundColor: "#F194FF",
-        borderRadius: 20,
-        padding: 10,
-        elevation: 2,
-    },
     flatlist: {
         height: 100,
     },
