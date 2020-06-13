@@ -1,4 +1,4 @@
-import React, { component } from "react";
+import React from "react";
 import {
     StyleSheet,
     Switch,
@@ -21,14 +21,13 @@ import {
     Textarea,
 } from "native-base";
 import { useObserver } from "mobx-react-lite";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import * as Fetching from "../components/fetching";
 import ImagePicker from "react-native-image-picker";
-import { autorun } from "mobx";
 
 function NewAccount({ navigation }) {
     const [Admin, setAdmin] = useState(false);
-    const toggleSwitch = () => setAdmin((previousState) => !previousState);
+
     const [UserName, setUserName] = useState("");
     const [Password, setPassword] = useState("");
     const [RePassword, setRePassword] = useState("");
@@ -89,6 +88,8 @@ function NewAccount({ navigation }) {
             }
         );
     }
+
+    const toggleSwitch = () => setAdmin((previousState) => !previousState);
 
     return useObserver(() => (
         <Container style={styles.container}>
@@ -212,6 +213,10 @@ function NewAccount({ navigation }) {
     ));
 }
 
+// Screen area
+const deviceWidth = Dimensions.get("window").width;
+const deviceHeight = Dimensions.get("window").height;
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -221,9 +226,9 @@ const styles = StyleSheet.create({
     },
     image: {
         flex: 1,
-        marginTop: 10,
-        height: 150,
-        width: 150,
+        marginTop: deviceHeight * 0.015,
+        height: deviceWidth * 0.4,
+        width: deviceWidth * 0.4,
         resizeMode: "contain",
         alignSelf: "center",
     },
@@ -231,21 +236,21 @@ const styles = StyleSheet.create({
         backgroundColor: "#F77F00",
     },
     h1: {
-        marginTop: 5,
+        marginTop: deviceHeight * 0.008,
         fontSize: 30,
         textAlign: "center",
     },
     card: {
-        margin: 10,
-        width: 350,
-        height: 700,
-        paddingBottom: 10,
+        margin: deviceHeight * 0.015,
+        width: deviceWidth * 0.9,
+        height: deviceHeight * 0.9,
+        paddingBottom: deviceHeight * 0.015,
     },
     button: {
         alignSelf: "center",
         justifyContent: "center",
-        margin: 5,
-        width: 250,
+        margin: deviceHeight * 0.015,
+        width: deviceWidth * 0.65,
     },
     text: {
         fontSize: 20,
@@ -253,19 +258,19 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     itemSwitch: {
-        padding: 5,
+        padding: deviceHeight * 0.015,
     },
     itemTextArea: {
-        paddingRight: 15,
+        paddingRight: deviceWidth * 0.04,
     },
     textarea: {
         flex: 1,
-        height: 70,
-        width: 300,
-        paddingRight: 10,
+        height: deviceHeight * 0.1,
+        width: deviceWidth * 0.75,
+        paddingRight: deviceWidth * 0.025,
         borderColor: "gray",
         borderWidth: 1,
-        fontSize: 12,
+        fontSize: 14,
         alignSelf: "center",
     },
 });

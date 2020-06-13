@@ -8,6 +8,7 @@ import {
     Modal,
     Image,
     TouchableHighlight,
+    Dimensions,
 } from "react-native";
 import { useObserver } from "mobx-react-lite";
 import store from "../store/store";
@@ -367,6 +368,10 @@ function MapScreen({ navigation }) {
         </View>
     ));
 }
+
+// Screen area
+const deviceWidth = Dimensions.get("window").width;
+const deviceHeight = Dimensions.get("window").height;
 
 const styles = StyleSheet.create({
     page: {

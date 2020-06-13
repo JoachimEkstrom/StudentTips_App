@@ -1,15 +1,30 @@
 import React from "react";
 import {
     StyleSheet,
-    Text,
-    Button,
     TextInput,
     View,
     FlatList,
     Modal,
     Image,
     TouchableHighlight,
+    Dimensions,
 } from "react-native";
+import {
+    Container,
+    Button,
+    Text,
+    Card,
+    Input,
+    Content,
+    Form,
+    Label,
+    Header,
+    Item,
+    Icon,
+    Textarea,
+    List,
+    ListItem,
+} from "native-base";
 import { useObserver } from "mobx-react-lite";
 import store from "../store/store";
 import { useEffect, useState } from "react";
@@ -22,7 +37,7 @@ function EditPin(props) {
     const [TagText, setTagText] = useState("");
     const [Tags, setTags] = useState([]);
     const [openModalVisible, setOpenModalVisible] = useState(false);
-    const [Img, setImg] = useState([]);
+    const [Img, setImg] = useState(null);
     const [updated, setupdated] = useState(false);
 
     let copyPin = store.getMapPins;
@@ -34,7 +49,7 @@ function EditPin(props) {
         setPinTitle(thisPin.pinTitle);
         setPinDescription(thisPin.pinDescription);
         setTags(thisPin.pinTags);
-        setImg([thisPin.pinImage]);
+        setImg(thisPin.pinImage);
     }, []);
 
     function UpdatePin() {
@@ -42,7 +57,7 @@ function EditPin(props) {
 
         pin.append("pinTitle", PinTitle);
         pin.append("pinDescription", PinDescription);
-        pin.append("pinImage", Img[0]);
+        pin.append("pinImage", Img);
         pin.append("pinTags", JSON.stringify(Tags));
         pin.append(
             "pinCoordinates",
@@ -54,7 +69,7 @@ function EditPin(props) {
         pin.append("pinUser", user.userId);
         pin.append("pinId", thisPin.pinId);
 
-        Fetching.patchPinInDb(pin, thisPin.pinId);
+        Fetching.patchPinInDb(pin, thisPin.pinId, user.token);
         setOpenModalVisible(!openModalVisible);
     }
 
@@ -74,234 +89,279 @@ function EditPin(props) {
                         response.uri.substr(response.uri.lastIndexOf("/") + 1),
                 };
 
-                setImg([image]);
+                setImg(image);
                 setupdated(true);
             }
         );
     }
 
+    function closeModal() {
+        setPinTitle(thisPin.pinTitle);
+        setPinDescription(thisPin.pinDescription);
+        setTags(copyPin.pinTags);
+        setImg(null);
+        setupdated(false);
+        setOpenModalVisible(!openModalVisible);
+    }
+
+    function deletePin() {
+        Fetching.deletePinInDb(thisPin.pinId, user.token);
+        store.deleteOneMapPin(props.pinIndex);
+        setOpenModalVisible(!openModalVisible);
+    }
+
     return useObserver(() => (
         <View style={styles.container}>
-            <Button
-                color="#F77F00"
-                title="Edit this pin"
-                onPress={() => {
-                    setOpenModalVisible(true);
-                }}
-            />
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={openModalVisible}
-            >
-                <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Text style={{ fontSize: 20, textAlign: "center" }}>
-                                Title:{" "}
-                            </Text>
-                            <TextInput
-                                style={{
-                                    height: 40,
-                                    width: 80,
-                                    borderColor: "gray",
-                                    borderWidth: 1,
-                                    fontSize: 16,
-                                }}
-                                onChangeText={(text) => setPinTitle(text)}
-                                value={PinTitle}
-                            />
-                        </View>
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Text style={{ fontSize: 20, textAlign: "center" }}>
-                                Description:{" "}
-                            </Text>
-                            <TextInput
-                                style={{
-                                    height: 40,
-                                    width: 80,
-                                    borderColor: "gray",
-                                    borderWidth: 1,
-                                    fontSize: 16,
-                                }}
-                                onChangeText={(text) => setPinDescription(text)}
-                                value={PinDescription}
-                            />
-                        </View>
-                        <Text style={styles.modalText}>
-                            Latitude: {thisPin.pinCoordinates.y}
-                        </Text>
-                        <Text style={styles.modalText}>
-                            Longitude: {thisPin.pinCoordinates.x}
-                        </Text>
-
-                        {/* Edit Tags */}
-                        <View style={styles.flatlist}>
-                            <FlatList
-                                data={Tags}
-                                extraData={Tags}
-                                renderItem={({ item }) => (
-                                    <View>
-                                        <Text>{item}</Text>
-                                        <TouchableHighlight
-                                            style={{
-                                                ...styles.openButton,
-                                                backgroundColor: "#F77F00",
-                                            }}
-                                            onPress={() => {
-                                                for (
-                                                    let i = 0;
-                                                    i < Tags.length;
-                                                    i++
-                                                ) {
-                                                    if (item == Tags[i]) {
-                                                        Tags.splice(i, 1);
-
-                                                        setTags(
-                                                            JSON.parse(
-                                                                JSON.stringify(
-                                                                    Tags
-                                                                )
-                                                            )
-                                                        );
-                                                    }
+            <Content>
+                <Button
+                    iconLeft
+                    style={styles.button}
+                    rounded
+                    onPress={() => {
+                        setOpenModalVisible(true);
+                    }}
+                >
+                    <Icon name="menu" />
+                    <Text>Edit pin</Text>
+                </Button>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={openModalVisible}
+                >
+                    <View style={styles.centeredView}>
+                        <Container style={styles.modalView}>
+                            <Container>
+                                <Container style={styles.modalContent}>
+                                    <Form>
+                                        <Item fixedLabel last>
+                                            <Label>Title:</Label>
+                                            <Input
+                                                onChangeText={(text) =>
+                                                    setPinTitle(text)
                                                 }
-                                            }}
+                                                value={PinTitle}
+                                            />
+                                        </Item>
+                                        <Item fixedLabel last>
+                                            <Label>Description:</Label>
+                                            <Input
+                                                onChangeText={(text) =>
+                                                    setPinDescription(text)
+                                                }
+                                                value={PinDescription}
+                                            />
+                                        </Item>
+                                    </Form>
+                                </Container>
+                                {/* Edit Tags */}
+                                <Container style={styles.flatlistContainer}>
+                                    <FlatList
+                                        style={styles.flatlist}
+                                        data={Tags}
+                                        extraData={Tags}
+                                        renderItem={({ item }) => (
+                                            <Container
+                                                style={styles.listContainer}
+                                            >
+                                                <Text style={styles.tagText}>
+                                                    {item}
+                                                </Text>
+                                                <Button
+                                                    iconLeft
+                                                    rounded
+                                                    danger
+                                                    style={styles.tagButton}
+                                                    onPress={() => {
+                                                        for (
+                                                            let i = 0;
+                                                            i < Tags.length;
+                                                            i++
+                                                        ) {
+                                                            if (
+                                                                item == Tags[i]
+                                                            ) {
+                                                                Tags.splice(
+                                                                    i,
+                                                                    1
+                                                                );
+                                                                setTags(
+                                                                    JSON.parse(
+                                                                        JSON.stringify(
+                                                                            Tags
+                                                                        )
+                                                                    )
+                                                                );
+                                                            }
+                                                        }
+                                                    }}
+                                                >
+                                                    <Icon
+                                                        name="trash"
+                                                        style={styles.tagIcon}
+                                                    />
+                                                </Button>
+                                            </Container>
+                                        )}
+                                        keyExtractor={(item, index) =>
+                                            index.toString()
+                                        }
+                                    ></FlatList>
+                                </Container>
+                                <Container style={styles.addTag}>
+                                    <Form style={styles.addTagForm}>
+                                        <Item
+                                            fixedLabel
+                                            last
+                                            style={styles.addTagItem}
                                         >
-                                            <Text style={styles.textStyle}>
-                                                Delete tag
-                                            </Text>
-                                        </TouchableHighlight>
-                                    </View>
-                                )}
-                                keyExtractor={(item, index) => index.toString()}
-                            ></FlatList>
-                        </View>
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Text style={{ fontSize: 20, textAlign: "center" }}>
-                                Tags:{" "}
-                            </Text>
-                            <TextInput
-                                style={{
-                                    height: 40,
-                                    width: 80,
-                                    borderColor: "gray",
-                                    borderWidth: 1,
-                                    fontSize: 16,
-                                }}
-                                onChangeText={(text) => setTagText(text)}
-                                value={TagText}
-                            />
-                            <TouchableHighlight
-                                style={{
-                                    ...styles.openButton,
-                                    backgroundColor: "#F77F00",
-                                }}
-                                onPress={() => {
-                                    setTags([...Tags, TagText]);
-                                    setTagText("");
-                                }}
-                            >
-                                <Text style={styles.textStyle}>Add tag</Text>
-                            </TouchableHighlight>
-                        </View>
-                        {thisPin.pinImage !== null && (
-                            <View>
-                                {updated === false && (
-                                    <Image
-                                        source={{ uri: thisPin.pinImage }}
-                                        style={styles.image}
-                                    ></Image>
-                                )}
-                                {updated === true && (
-                                    <Image
-                                        source={{ uri: Img[0].uri }}
-                                        style={styles.image}
-                                    ></Image>
-                                )}
-                                <TouchableHighlight
-                                    style={{
-                                        ...styles.openButton,
-                                        backgroundColor: "#F77F00",
-                                    }}
-                                    onPress={() => {
-                                        updateImage();
-                                    }}
-                                >
-                                    <Text style={styles.textStyle}>
-                                        Change picture
-                                    </Text>
-                                </TouchableHighlight>
-                            </View>
-                        )}
+                                            <Label style={styles.addTagLable}>
+                                                New tag:
+                                            </Label>
+                                            <Input
+                                                style={styles.addTagInput}
+                                                onChangeText={(text) =>
+                                                    setTagText(text)
+                                                }
+                                                value={TagText}
+                                            />
+                                        </Item>
+                                    </Form>
+                                    <Button
+                                        iconLeft
+                                        rounded
+                                        style={styles.tagButton}
+                                        onPress={() => {
+                                            setTags([...Tags, TagText]);
+                                            setTagText("");
+                                        }}
+                                    >
+                                        <Icon
+                                            name="add"
+                                            style={styles.tagIcon}
+                                        />
+                                    </Button>
+                                </Container>
+                            </Container>
+                            <Container>
+                                <Container style={styles.lowerParts}>
+                                    {(thisPin.pinImage !== null ||
+                                        updated === true) && (
+                                        <>
+                                            <Container
+                                                style={styles.imageContainer}
+                                            >
+                                                {updated === false && (
+                                                    <Image
+                                                        source={{
+                                                            uri:
+                                                                thisPin.pinImage,
+                                                        }}
+                                                        style={styles.image}
+                                                    ></Image>
+                                                )}
+                                                {updated === true && (
+                                                    <Image
+                                                        source={{
+                                                            uri: Img.uri,
+                                                        }}
+                                                        style={styles.image}
+                                                    ></Image>
+                                                )}
+                                            </Container>
+                                            <Button
+                                                iconLeft
+                                                rounded
+                                                onPress={() => {
+                                                    updateImage();
+                                                }}
+                                            >
+                                                <Icon name="settings" />
+                                                <Text>Change picture</Text>
+                                            </Button>
+                                        </>
+                                    )}
+                                    {/* if no picture add one. */}
+                                    {thisPin.pinImage === null &&
+                                        updated === false && (
+                                            <>
+                                                <Container
+                                                    style={
+                                                        styles.imageContainer
+                                                    }
+                                                >
+                                                    {updated === true && (
+                                                        <Image
+                                                            source={{
+                                                                uri: Img.uri,
+                                                            }}
+                                                            style={styles.image}
+                                                        ></Image>
+                                                    )}
+                                                </Container>
+                                                <Button
+                                                    iconLeft
+                                                    rounded
+                                                    style={styles.buttons}
+                                                    onPress={() => {
+                                                        updateImage();
+                                                    }}
+                                                >
+                                                    <Icon name="settings" />
+                                                    <Text>Add picture</Text>
+                                                </Button>
+                                            </>
+                                        )}
 
-                        {/* Update pin */}
-                        <TouchableHighlight
-                            style={{
-                                ...styles.openButton,
-                                backgroundColor: "#2196F3",
-                            }}
-                            onPress={() => {
-                                UpdatePin();
-                            }}
-                        >
-                            <Text style={styles.textStyle}>Update pin</Text>
-                        </TouchableHighlight>
-                        {/* Close modal */}
-                        <TouchableHighlight
-                            style={{
-                                ...styles.openButton,
-                                backgroundColor: "#F77F00",
-                            }}
-                            onPress={() => {
-                                setPinTitle(thisPin.pinTitle);
-                                setPinDescription(thisPin.pinDescription);
-                                setTags(copyPin.pinTags);
-                                setOpenModalVisible(!openModalVisible);
-                            }}
-                        >
-                            <Text style={styles.textStyle}>
-                                Discard changes and close
-                            </Text>
-                        </TouchableHighlight>
-
-                        {/* Delete pin  */}
-                        <TouchableHighlight
-                            style={{
-                                ...styles.openButton,
-                                backgroundColor: "#D62828",
-                            }}
-                            onPress={() => {
-                                Fetching.deletePinInDb(thisPin.pinId);
-                                store.deleteOneMapPin(props.pinIndex);
-                                setOpenModalVisible(!openModalVisible);
-                            }}
-                        >
-                            <Text style={styles.textStyle}>
-                                Delete this pin
-                            </Text>
-                        </TouchableHighlight>
+                                    {/* Update pin */}
+                                    <Button
+                                        iconLeft
+                                        rounded
+                                        style={styles.buttons}
+                                        onPress={() => {
+                                            UpdatePin();
+                                        }}
+                                    >
+                                        <Icon name="settings" />
+                                        <Text>Update pin</Text>
+                                    </Button>
+                                    {/* Close modal */}
+                                    <Button
+                                        iconLeft
+                                        rounded
+                                        style={styles.buttons}
+                                        onPress={() => {
+                                            closeModal();
+                                        }}
+                                    >
+                                        <Icon name="arrow-back" />
+                                        <Text>Discard changes and close</Text>
+                                    </Button>
+                                    {/* Delete pin  */}
+                                    <Button
+                                        iconLeft
+                                        rounded
+                                        danger
+                                        style={styles.buttons}
+                                        onPress={() => {
+                                            deletePin();
+                                        }}
+                                    >
+                                        <Icon name="trash" />
+                                        <Text>Delete this pin</Text>
+                                    </Button>
+                                </Container>
+                            </Container>
+                        </Container>
                     </View>
-                </View>
-            </Modal>
+                </Modal>
+            </Content>
         </View>
     ));
 }
+// Screen area
+const deviceWidth = Dimensions.get("window").width;
+const deviceHeight = Dimensions.get("window").height;
 
 const styles = StyleSheet.create({
     container: {
@@ -309,45 +369,131 @@ const styles = StyleSheet.create({
         backgroundColor: "#FCBF49",
         alignItems: "center",
         justifyContent: "center",
-        height: 70,
+        height: 50,
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 0,
     },
     modalView: {
-        margin: 20,
+        flex: 1,
+        flexDirection: "column",
+        height: deviceHeight * 0.95,
+        width: deviceWidth * 0.95,
+        margin: 10,
         backgroundColor: "white",
         borderRadius: 20,
-        padding: 35,
+        padding: 20,
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: {
-            width: 0,
+            width: 20,
             height: 2,
         },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
     },
-    openButton: {
-        backgroundColor: "#F194FF",
-        borderRadius: 20,
-        padding: 10,
-        elevation: 2,
+    modalContent: {
+        flex: 0.3,
+        height: 30,
+        width: 330,
     },
-    textStyle: {
-        color: "white",
-        fontWeight: "bold",
-        textAlign: "center",
-    },
-    modalText: {
-        marginBottom: 15,
-        textAlign: "center",
+    flatlistContainer: {
+        marginTop: 5,
+        flex: 0.5,
+        height: 70,
+        width: 330,
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
     },
     flatlist: {
-        height: 100,
+        flex: 1,
+        height: 40,
+        width: 330,
+    },
+    listContainer: {
+        flex: 0.1,
+        height: 40,
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    tagText: {
+        flex: 0.8,
+        height: 30,
+        textAlign: "center",
+    },
+    tagButton: {
+        flex: 0.2,
+        height: 30,
+        width: 30,
+        borderRadius: 20,
+        padding: 0,
+        margin: 0,
+        justifyContent: "center",
+        alignSelf: "center",
+    },
+    tagIcon: {
+        height: 30,
+        width: 30,
+        marginLeft: 15,
+        marginTop: 5,
+        justifyContent: "center",
+        alignSelf: "center",
+    },
+    addTag: {
+        marginTop: 10,
+        flex: 0.2,
+        height: 70,
+        width: 330,
+        flexDirection: "row",
+    },
+    addTagForm: {
+        flex: 0.8,
+        height: 50,
+        width: 200,
+    },
+    addTagItem: {
+        flex: 1,
+        height: 50,
+        width: 330,
+        textAlign: "center",
+        flexDirection: "row",
+    },
+    addTagLable: {
+        flex: 0.25,
+        height: 30,
+        width: 40,
+    },
+    addTagInput: {
+        flex: 0.75,
+        height: 50,
+        width: 120,
+        fontSize: 20,
+    },
+    lowerParts: {
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    imageContainer: {
+        flex: 1,
+        height: 180,
+        width: 180,
     },
     image: {
-        height: 200,
-        width: 200,
+        flex: 1,
+        height: 180,
+        width: 180,
         resizeMode: "contain",
+        justifyContent: "center",
+        alignSelf: "center",
+    },
+    buttons: {
+        marginTop: 5,
     },
 });
 

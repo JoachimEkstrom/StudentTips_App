@@ -1,5 +1,11 @@
 import React, { component } from "react";
-import { StyleSheet, Image, TextInput, ToastAndroid } from "react-native";
+import {
+    StyleSheet,
+    Image,
+    TextInput,
+    ToastAndroid,
+    Dimensions,
+} from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Container, Button, Text, Icon } from "native-base";
 import { useObserver } from "mobx-react-lite";
@@ -49,7 +55,7 @@ function Home({ navigation }) {
     return useObserver(() => (
         <KeyboardAwareScrollView
             enableOnAndroid={true}
-            extraScrollHeight={200}
+            extraScrollHeight={deviceHeight * 0.28}
             keyboardShouldPersistTaps="always"
         >
             <Container style={styles.container}>
@@ -77,7 +83,7 @@ function Home({ navigation }) {
                 <Button
                     iconLeft
                     primary
-                    style={{ marginTop: 10 }}
+                    style={styles.button}
                     rounded
                     color="#F77F00"
                     onPress={() => {
@@ -90,7 +96,7 @@ function Home({ navigation }) {
                 <Button
                     iconLeft
                     primary
-                    style={{ marginTop: 10 }}
+                    style={styles.button}
                     rounded
                     color="#F77F00"
                     onPress={() => {
@@ -101,11 +107,14 @@ function Home({ navigation }) {
                     <Icon name="person-add" />
                     <Text>Create new account!</Text>
                 </Button>
-                <Container style={{ margin: 50 }}></Container>
+                <Container style={{ margin: deviceWidth * 0.1 }}></Container>
             </Container>
         </KeyboardAwareScrollView>
     ));
 }
+// Screen area
+const deviceWidth = Dimensions.get("window").width;
+const deviceHeight = Dimensions.get("window").height;
 
 const styles = StyleSheet.create({
     container: {
@@ -115,36 +124,39 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     image: {
-        marginTop: 10,
-        height: 150,
-        width: 150,
+        marginTop: deviceHeight * 0.015,
+        height: deviceWidth * 0.4,
+        width: deviceWidth * 0.4,
         resizeMode: "contain",
     },
     textH1: {
-        marginTop: 10,
-        marginBottom: 50,
+        marginTop: deviceHeight * 0.015,
+        marginBottom: deviceHeight * 0.065,
         fontSize: 36,
     },
     text: {
         fontSize: 16,
-        height: 20,
-        marginLeft: 10,
+        height: deviceHeight * 0.03,
+        marginLeft: deviceWidth * 0.025,
     },
     textInput: {
         flex: 1,
         fontSize: 16,
-        height: 50,
-        marginLeft: 5,
+        height: deviceHeight * 0.065,
+        marginLeft: deviceWidth * 0.015,
+    },
+    button: {
+        marginTop: deviceHeight * 0.015,
     },
     fields: {
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        width: 300,
-        height: 20,
-        marginTop: 10,
-        marginBottom: 5,
-        borderRadius: 20,
+        width: deviceWidth * 0.75,
+        height: deviceHeight * 0.03,
+        marginTop: deviceHeight * 0.015,
+        marginBottom: deviceHeight * 0.005,
+        borderRadius: deviceHeight * 0.03,
     },
 });
 

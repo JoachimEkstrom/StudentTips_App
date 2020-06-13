@@ -1,16 +1,21 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+import { Container, Button, Text, Icon } from "native-base";
 import { useObserver } from "mobx-react-lite";
 import EditPin from "../components/EditPin";
 
 function ListYourPins(props) {
     return useObserver(() => (
-        <View style={styles.container}>
-            <Text>{props.id}</Text>
+        <Container style={styles.container}>
+            <Text style={styles.text}>{props.id}</Text>
             <EditPin pinIndex={props.index}></EditPin>
-        </View>
+        </Container>
     ));
 }
+
+// Screen area
+const deviceWidth = Dimensions.get("window").width;
+const deviceHeight = Dimensions.get("window").height;
 
 const styles = StyleSheet.create({
     container: {
@@ -18,7 +23,10 @@ const styles = StyleSheet.create({
         backgroundColor: "#FCBF49",
         alignItems: "center",
         justifyContent: "center",
-        height: 75,
+        height: deviceHeight * 0.105,
+    },
+    text: {
+        fontSize: 20,
     },
 });
 

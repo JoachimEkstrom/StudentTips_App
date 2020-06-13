@@ -67,12 +67,13 @@ async function addPinToDb(pin, token) {
     return null;
 }
 
-async function patchPinInDb(pin, index) {
+async function patchPinInDb(pin, index, token) {
     console.log(pin);
     await fetch(`http://116.203.125.0:12001/pins/` + index, {
         method: "PATCH",
         headers: {
             "Content-Type": "multipart/form-data",
+            Token: token,
         },
         body: pin,
     }).then((response) => console.log(response.status));
@@ -82,10 +83,13 @@ async function patchPinInDb(pin, index) {
     return null;
 }
 
-async function deletePinInDb(pin) {
+async function deletePinInDb(pin, token) {
     console.log(pin);
     await fetch(`http://116.203.125.0:12001/pins/${pin}`, {
         method: "DELETE",
+        headers: {
+            Token: token,
+        },
     }).then((response) => console.log(response.status));
 
     await getPins();

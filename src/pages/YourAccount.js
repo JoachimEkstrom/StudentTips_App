@@ -1,17 +1,15 @@
-import React, { component } from "react";
-import {
-    StyleSheet,
-    ScrollView,
-    SafeAreaView,
-    ToastAndroid,
-} from "react-native";
-import { Container, Button, Text } from "native-base";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, ToastAndroid, Dimensions, StatusBar } from "react-native";
+import { Container, Button, Text, Header, Icon } from "native-base";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useObserver } from "mobx-react-lite";
 import store from "../store/store";
 import ListYourPins from "../components/ListYourPins";
 import * as Fetching from "../components/fetching";
 
 function YourAccount({ navigation }) {
+    const [UserName, setUserName] = useState("");
+
     function ListPin() {
         let pins = store.getMapPins;
         let user = store.getCurrentUser;
@@ -33,7 +31,6 @@ function YourAccount({ navigation }) {
     async function logout() {
         let user = store.getCurrentUser;
         let message = await Fetching.logout(user.token);
-        console.log(message);
         showToast(message.message);
         if (message.loggedOut === true) {
             navigation.navigate("Home");
@@ -44,33 +41,67 @@ function YourAccount({ navigation }) {
         ToastAndroid.show(message, ToastAndroid.SHORT);
     }
 
+    useEffect(() => {
+        let user = store.getCurrentUser;
+        setUserName(user.userName);
+    }, []);
+
     return useObserver(() => (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Button
-                style={{ marginTop: 10 }}
-                rounded
-                color="#F77F00"
-                onPress={() => logout()}
+        <>
+            <StatusBar backgroundColor="#F77F00" />
+            <Header style={styles.header}>
+                <Text style={styles.headerText}>{UserName}'s Pins</Text>
+            </Header>
+            <KeyboardAwareScrollView
+                enableOnAndroid={true}
+                extraScrollHeight={deviceHeight * 0.28}
+                keyboardShouldPersistTaps="always"
+                style={{ backgroundColor: "#FCBF49" }}
             >
-                <Text>Logout</Text>
-            </Button>
-            <Text style={styles.text}>Account page FTW!</Text>
-            {ListPin()}
-        </ScrollView>
+                {ListPin()}
+            </KeyboardAwareScrollView>
+            <Container style={styles.container}>
+                <Button
+                    iconLeft
+                    danger
+                    rounded
+                    color="#F77F00"
+                    onPress={() => logout()}
+                >
+                    <Icon name="log-out" />
+                    <Text>Logout</Text>
+                </Button>
+            </Container>
+        </>
     ));
 }
+// Screen area
+const deviceWidth = Dimensions.get("window").width;
+const deviceHeight = Dimensions.get("window").height;
 
 const styles = StyleSheet.create({
     container: {
+        height: deviceHeight * 0.3,
         flex: 1,
         backgroundColor: "#FCBF49",
         alignItems: "center",
         justifyContent: "center",
+        paddingTop: deviceHeight * 0.04,
+        paddingBottom: deviceHeight * 0.05,
+        // borderTopWidth: 1,
+        // borderColor: "black",
     },
-    text: {
-        fontSize: 16,
-        height: 20,
-        marginLeft: 10,
+    header: {
+        backgroundColor: "#F77F00",
+        height: deviceHeight * 0.065,
+    },
+    headerText: {
+        justifyContent: "center",
+        alignSelf: "center",
+        fontSize: 26,
+        height: deviceHeight * 0.045,
+        padding: 0,
+        margin: 0,
     },
 });
 
