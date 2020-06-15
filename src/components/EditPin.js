@@ -1,31 +1,6 @@
 import React from "react";
-import {
-    StyleSheet,
-    TextInput,
-    View,
-    FlatList,
-    Modal,
-    Image,
-    TouchableHighlight,
-    Dimensions,
-    KeyboardAvoidingView,
-} from "react-native";
-import {
-    Container,
-    Button,
-    Text,
-    Card,
-    Input,
-    Content,
-    Form,
-    Label,
-    Header,
-    Item,
-    Icon,
-    Textarea,
-    List,
-    ListItem,
-} from "native-base";
+import { StyleSheet, View, FlatList, Modal, Image, Dimensions } from "react-native";
+import { Container, Button, Text, Input, Content, Form, Label, Item, Icon } from "native-base";
 import { useObserver } from "mobx-react-lite";
 import store from "../store/store";
 import { useEffect, useState } from "react";
@@ -265,6 +240,7 @@ function EditPin(props) {
                                 <Button
                                     iconLeft
                                     rounded
+                                    success
                                     style={styles.buttons}
                                     onPress={() => {
                                         UpdatePin();
@@ -454,7 +430,7 @@ const styles = StyleSheet.create({
     },
     image: {
         flex: 1,
-        height: 200,
+        height: 200, // Kolla detta
         width: 200,
         resizeMode: "contain",
         justifyContent: "center",

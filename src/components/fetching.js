@@ -3,11 +3,8 @@ import { AsyncStorage } from "react-native";
 
 async function setToken(token, userId) {
     try {
-        console.log(token);
         await AsyncStorage.setItem("Token", token);
         await AsyncStorage.setItem("userId", userId);
-        console.log(token);
-        console.log(userId);
     } catch (error) {
         console.log("Error in Async storage, setToken");
         console.log(error);
@@ -21,6 +18,7 @@ async function getToken(user) {
         userId = await AsyncStorage.getItem("userId");
         console.log("Getting Token");
         console.log(token);
+        console.log(userId);
         store.userLoggedIn({
             userName: user.userName,
             token: token,
@@ -126,6 +124,7 @@ async function login(user) {
     let message = {
         message: "",
         loggedIn: false,
+        userId: "",
     };
     await fetch(`http://116.203.125.0:12001/login`, {
         method: "POST",
@@ -137,8 +136,9 @@ async function login(user) {
     })
         .then((response) => response.json())
         .then((result) => {
-            message.message = result.message;
             console.log(result);
+            message.message = result.message;
+            message.userId = result.user;
 
             if (result.status === 1) {
                 store.userLoggedIn({
@@ -159,15 +159,18 @@ async function login(user) {
     return message;
 }
 
-async function getUserImage(user) {
+async function getUserImage(id) {
     let image = null;
+    if (id !== undefined) {
+        await fetch(`http://116.203.125.0:12001/users/${id}`)
+            .then((response) => response.json())
+            .then((result) => {
+                image = result.userImage;
+                console.log(image);
+            });
+    }
 
-    await fetch(`http://116.203.125.0:12001/users/${user}`)
-        .then((response) => response.json())
-        .then((result) => {
-            image = result.userImage;
-            return image;
-        });
+    return image;
 }
 
 async function logout(token) {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, ToastAndroid, Dimensions, StatusBar, View, Image } from "react-native";
+import { StyleSheet, ToastAndroid, Dimensions, StatusBar, ImageBackground } from "react-native";
 import { Container, Button, Text, Header, Icon } from "native-base";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useObserver } from "mobx-react-lite";
@@ -8,13 +8,13 @@ import ListYourPins from "../components/ListYourPins";
 import * as Fetching from "../components/fetching";
 
 function YourAccount({ navigation }) {
-    const [UserName, setUserName] = useState("");
+    const [User, setUser] = useState("");
     let user = store.getCurrentUser;
     console.log(user);
 
     function ListPin() {
         let pins = store.getMapPins;
-        user = store.getCurrentUser;
+        // user = store.getCurrentUser;
         return pins.map((pin, index) => {
             if (pin.pinUser === user.userId) {
                 return <ListYourPins key={index} index={index} id={pin.pinTitle}></ListYourPins>;
@@ -25,7 +25,7 @@ function YourAccount({ navigation }) {
     }
 
     async function logout() {
-        user = store.getCurrentUser;
+        // user = store.getCurrentUser;
         let message = await Fetching.logout(user.token);
         showToast(message.message);
         if (message.loggedOut === true) {
@@ -40,35 +40,29 @@ function YourAccount({ navigation }) {
     useEffect(() => {
         user = store.getCurrentUser;
 
-        setUserName(user.userName);
+        setUser(user);
     }, []);
 
     return useObserver(() => (
         <>
             <StatusBar backgroundColor="#F77F00" />
             <Header style={styles.header}>
-                <Text style={styles.headerText}>{UserName}'s Pins</Text>
-                {/* { !== null && (
-                    <View>
-                        <Image
-                            source={{
-                                uri: UserImage,
-                            }}
-                            style={styles.image}
-                        ></Image>
-                    </View>
-                )} */}
+                {user.userImage !== null && (
+                    <ImageBackground
+                        source={{
+                            uri: user.userImage,
+                        }}
+                        style={styles.image}
+                    >
+                        <Text style={styles.headerText}>{User.userName}'s Pins</Text>
+                    </ImageBackground>
+                )}
             </Header>
-            <KeyboardAwareScrollView
-                enableOnAndroid={true}
-                extraScrollHeight={deviceHeight * 0.28}
-                keyboardShouldPersistTaps="always"
-                style={{ backgroundColor: "#FCBF49" }}
-            >
+            <KeyboardAwareScrollView enableOnAndroid={true} keyboardShouldPersistTaps="always" style={styles.scroll}>
                 {ListPin()}
             </KeyboardAwareScrollView>
             <Container style={styles.container}>
-                <Button iconLeft danger rounded color="#F77F00" onPress={() => logout()}>
+                <Button style={styles.button} iconLeft danger rounded color="#F77F00" onPress={() => logout()}>
                     <Icon name="log-out" />
                     <Text>Logout</Text>
                 </Button>
@@ -81,28 +75,55 @@ const deviceWidth = Dimensions.get("window").width;
 const deviceHeight = Dimensions.get("window").height;
 
 const styles = StyleSheet.create({
-    container: {
-        height: deviceHeight * 0.3,
-        flex: 1,
-        backgroundColor: "#FCBF49",
-        alignItems: "center",
-        justifyContent: "center",
-        paddingTop: deviceHeight * 0.04,
-        paddingBottom: deviceHeight * 0.05,
-        // borderTopWidth: 1,
-        // borderColor: "black",
-    },
     header: {
         backgroundColor: "#F77F00",
-        height: deviceHeight * 0.065,
+        height: deviceHeight * 0.2,
+        width: deviceWidth * 1,
+        alignItems: "center",
+        justifyContent: "center",
+        margin: 0,
+        padding: 0,
     },
     headerText: {
         justifyContent: "center",
         alignSelf: "center",
-        fontSize: 26,
-        height: deviceHeight * 0.045,
-        padding: 0,
+        textAlign: "center",
+        fontSize: 36,
+        height: deviceHeight * 0.1,
+        padding: 10,
         margin: 0,
+        borderRadius: 20,
+        backgroundColor: "rgba(255, 255, 255, 0.3)",
+        left: 10,
+    },
+    image: {
+        flex: 1,
+        height: deviceHeight * 0.2,
+        width: deviceWidth * 1,
+        resizeMode: "contain",
+        backgroundColor: "#F77F00",
+        justifyContent: "center",
+        alignSelf: "center",
+        margin: 0,
+        padding: 0,
+        right: 10,
+    },
+    scroll: {
+        flex: 0.8,
+        backgroundColor: "#FCBF49",
+        // height: deviceHeight * 0.5,
+    },
+    container: {
+        height: deviceHeight * 0.3,
+        flex: 0.2,
+        backgroundColor: "#FCBF49",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        paddingTop: deviceHeight * 0.01,
+        paddingBottom: deviceHeight * 0.01,
+    },
+    button: {
+        flex: 0.3,
     },
 });
 

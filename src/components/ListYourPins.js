@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Dimensions } from "react-native";
-import { Container, Button, Text, Icon } from "native-base";
+import { Container, Text } from "native-base";
 import { useObserver } from "mobx-react-lite";
 import EditPin from "../components/EditPin";
 

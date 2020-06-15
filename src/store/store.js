@@ -32,6 +32,9 @@ const store = observable({
     userLoggedIn(user) {
         store.currentUser = user;
     },
+    saveUserImage(image) {
+        store.currentUser.userImage = image;
+    },
     userLoggedOut(user) {
         store.currentUser = user;
     },

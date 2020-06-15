@@ -1,6 +1,6 @@
-import React, { component } from "react";
+import React from "react";
 import { StyleSheet, View, FlatList, Modal, Image, Dimensions, KeyboardAvoidingView } from "react-native";
-import { Container, Button, Text, Input, Content, Form, Label, Item, Icon } from "native-base";
+import { Container, Button, Text, Input, Form, Label, Item, Icon } from "native-base";
 import { useObserver } from "mobx-react-lite";
 import store from "../store/store";
 import { useEffect, useState } from "react";
@@ -136,71 +136,64 @@ function MapScreen({ navigation }) {
 
                             <Form style={styles.form}>
                                 <Item fixedLabel>
-                                    <Label style={styles.lable}>Title:</Label>
-                                    <Input onChangeText={(text) => setPinTitle(text)} value={PinTitle} />
+                                    <Label style={styles.taglable}>Title:</Label>
+                                    <Input
+                                        style={styles.input}
+                                        onChangeText={(text) => setPinTitle(text)}
+                                        value={PinTitle}
+                                    />
                                 </Item>
                                 <Item fixedLabel>
-                                    <Label style={styles.lable}>Description:</Label>
-                                    <Input onChangeText={(text) => setPinDescription(text)} value={PinDescription} />
+                                    <Label style={styles.taglable}>Description:</Label>
+                                    <Input
+                                        style={styles.input}
+                                        onChangeText={(text) => setPinDescription(text)}
+                                        value={PinDescription}
+                                    />
+                                </Item>
+
+                                {/* tags */}
+                                <Item fixedLabel>
+                                    <Label style={styles.taglable}>Tags:</Label>
+                                    <Input
+                                        style={styles.input}
+                                        onChangeText={(text) => setTagText(text)}
+                                        value={TagText}
+                                    />
+                                    <Button
+                                        iconLeft
+                                        rounded
+                                        success
+                                        style={styles.addTagButton}
+                                        onPress={() => {
+                                            addtag();
+                                        }}
+                                    >
+                                        <Icon name="add" style={styles.tagIcon} />
+                                    </Button>
                                 </Item>
                             </Form>
-                            {/* tags */}
 
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <Form style={styles.form}>
-                                    <Item fixedLabel>
-                                        <Label style={styles.taglable}>Tags:</Label>
-                                        <Input
-                                            style={styles.input}
-                                            onChangeText={(text) => setTagText(text)}
-                                            value={TagText}
-                                        />
-                                        <Button
-                                            iconLeft
-                                            rounded
-                                            success
-                                            style={styles.addTagButton}
-                                            onPress={() => {
-                                                addtag();
-                                            }}
-                                        >
-                                            <Icon name="add" style={styles.tagIcon} />
-                                        </Button>
-                                    </Item>
-                                </Form>
-                            </View>
                             {/* display tags */}
                             <View style={styles.flatlist}>
                                 <FlatList
                                     data={Tags}
-                                    renderItem={({ item }) => (
-                                        <View>
-                                            <Text>{item}</Text>
-                                        </View>
-                                    )}
+                                    renderItem={({ item }) => <Text style={styles.flatlistText}>{item}</Text>}
                                     keyExtractor={(item, index) => index.toString()}
                                 ></FlatList>
                             </View>
 
                             {/* render images */}
                             {PinImage !== null && (
-                                <View>
-                                    <Image
-                                        source={{
-                                            uri: PinImage.uri,
-                                        }}
-                                        style={styles.image}
-                                    ></Image>
-                                </View>
+                                <Image
+                                    source={{
+                                        uri: PinImage.uri,
+                                    }}
+                                    style={styles.image}
+                                ></Image>
                             )}
-
-                            {/* Add picutures */}
-                            <View>
+                            <Container style={styles.lowerParts}>
+                                {/* Add picutures */}
                                 <Button
                                     iconLeft
                                     rounded
@@ -213,34 +206,35 @@ function MapScreen({ navigation }) {
                                     <Icon name="image" />
                                     <Text>Add picture</Text>
                                 </Button>
-                            </View>
-                            <Button
-                                iconLeft
-                                rounded
-                                success
-                                style={styles.buttons}
-                                onPress={() => {
-                                    saveNewPin();
-                                    setModalVisible(!modalVisible);
-                                }}
-                            >
-                                <Icon name="add" />
-                                <Text>Save and close</Text>
-                            </Button>
 
-                            {/* Close modal */}
-                            <Button
-                                iconLeft
-                                rounded
-                                warning
-                                style={styles.buttons}
-                                onPress={() => {
-                                    closeModal();
-                                }}
-                            >
-                                <Icon name="arrow-back" />
-                                <Text>Close without save</Text>
-                            </Button>
+                                <Button
+                                    iconLeft
+                                    rounded
+                                    success
+                                    style={styles.buttons}
+                                    onPress={() => {
+                                        saveNewPin();
+                                        setModalVisible(!modalVisible);
+                                    }}
+                                >
+                                    <Icon name="add" />
+                                    <Text>Save and close</Text>
+                                </Button>
+
+                                {/* Close modal */}
+                                <Button
+                                    iconLeft
+                                    rounded
+                                    warning
+                                    style={styles.buttons}
+                                    onPress={() => {
+                                        closeModal();
+                                    }}
+                                >
+                                    <Icon name="arrow-back" />
+                                    <Text>Close without save</Text>
+                                </Button>
+                            </Container>
                         </View>
                     </View>
                 </Modal>
@@ -252,28 +246,25 @@ function MapScreen({ navigation }) {
                     <View style={styles.modalView}>
                         <Text style={styles.showTagTitleText}>{modal.pinTitle}</Text>
                         <Text style={styles.showTagDescriptionText}>{modal.pinDescription}</Text>
-                        <View style={styles.flatlist}>
+                        <View style={styles.OpenModalflatlistContainer}>
                             <Text style={styles.showTagText}>Tags:</Text>
                             <FlatList
+                                style={styles.openModalFlatlist}
                                 data={modal.pinTags}
-                                renderItem={({ item }) => (
-                                    <View>
-                                        <Text style={styles.showTagItemText}>{item}</Text>
-                                    </View>
-                                )}
+                                renderItem={({ item }) => <Text style={styles.showTagItemText}>{item}</Text>}
                                 keyExtractor={(item, index) => index.toString()}
                             ></FlatList>
                         </View>
                         {/* render images */}
                         {modal.pinImage !== null && (
-                            <View>
+                            <Container style={styles.OpenimageContainer}>
                                 <Image
                                     source={{
                                         uri: modal.pinImage,
                                     }}
-                                    style={styles.image}
+                                    style={styles.openImage}
                                 ></Image>
-                            </View>
+                            </Container>
                         )}
                         {/* Close modal */}
                         <Button
@@ -307,8 +298,8 @@ const styles = StyleSheet.create({
         backgroundColor: "#FCBF49",
     },
     container: {
-        height: 700,
-        width: 500,
+        height: deviceHeight * 1,
+        width: deviceWidth * 1,
         backgroundColor: "tomato",
         resizeMode: "contain",
     },
@@ -316,32 +307,82 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     form: {
-        flex: 1,
-        width: 300,
-        height: 100,
+        flex: 0.3,
+        width: deviceWidth * 0.8,
         marginBottom: 10,
         justifyContent: "center",
-    },
-    lable: {
-        justifyContent: "center",
+        marginBottom: 10,
     },
     taglable: {
-        flex: 0.2,
-        width: 30,
+        flex: 0.35,
+        width: 50,
         justifyContent: "center",
     },
     input: {
-        width: 100,
+        flex: 0.2,
+        width: deviceWidth * 0.35,
         flex: 0.6,
     },
     flatlist: {
-        height: 150,
-        width: 200,
+        flex: 0.2,
+        marginTop: 35,
+        height: deviceHeight * 0.3,
+        width: deviceWidth * 0.6,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    OpenModalflatlistContainer: {
+        flex: 0.7,
+        marginTop: 35,
+        height: deviceHeight * 0.3,
+        width: deviceWidth * 0.6,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    openModalFlatlist: {
+        flex: 1,
+        width: deviceWidth * 0.6,
+    },
+    flatlistText: {
+        flex: 0.2,
+        width: deviceWidth * 0.6,
+        justifyContent: "center",
+        alignSelf: "center",
+        textAlign: "center",
+    },
+    imageContainer: {
+        flex: 0.2,
+        marginTop: 10,
+        height: deviceHeight * 0.3,
+        width: deviceWidth * 0.6,
+        backgroundColor: "#FFF9C4",
     },
     image: {
-        height: 200,
-        width: 200,
+        flex: 1,
+        height: 100,
+        width: 150,
         resizeMode: "contain",
+        backgroundColor: "#FFF9C4",
+        justifyContent: "center",
+        alignSelf: "center",
+    },
+    OpenimageContainer: {
+        flex: 0.7,
+        marginTop: 10,
+        height: deviceHeight * 0.5,
+        width: deviceWidth * 0.6,
+        backgroundColor: "#FFF9C4",
+        marginBottom: 20,
+    },
+
+    openImage: {
+        flex: 1,
+        height: deviceHeight * 0.15,
+        width: deviceWidth * 0.8,
+        resizeMode: "contain",
+        backgroundColor: "#FFF9C4",
+        justifyContent: "center",
+        alignSelf: "center",
     },
     centeredView: {
         flex: 1,
@@ -350,10 +391,13 @@ const styles = StyleSheet.create({
         marginTop: 22,
     },
     modalView: {
-        margin: 20,
-        backgroundColor: "white",
+        flex: 0.9,
+        width: deviceWidth * 0.9,
+        height: deviceHeight * 0.8,
+        margin: 10,
+        backgroundColor: "#FFF9C4",
         borderRadius: 20,
-        padding: 35,
+        padding: 25,
         alignItems: "center",
         shadowColor: "#000",
         shadowOffset: {
@@ -365,8 +409,18 @@ const styles = StyleSheet.create({
         elevation: 5,
         justifyContent: "flex-start",
     },
+    lowerParts: {
+        flex: 0.5,
+        justifyContent: "flex-end",
+        alignItems: "center",
+        backgroundColor: "#FFF9C4",
+    },
     buttons: {
-        marginBottom: 5,
+        flex: 0.8,
+        width: deviceWidth * 0.6,
+        marginTop: 10,
+        justifyContent: "center",
+        alignSelf: "center",
     },
     openButton: {
         backgroundColor: "#F194FF",
@@ -399,32 +453,43 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     modalText: {
-        marginBottom: 15,
+        flex: 0.2,
+        fontSize: 20,
+        marginBottom: 5,
         textAlign: "center",
     },
     showTagTitleText: {
+        flex: 0.2,
         fontSize: 30,
-        width: 200,
+        height: 20,
+        width: deviceWidth * 0.7,
         marginBottom: 10,
         textAlign: "center",
     },
     showTagDescriptionText: {
+        flex: 0.2,
         fontSize: 20,
-        width: 200,
+        width: deviceWidth * 0.7,
         marginBottom: 20,
         textAlign: "center",
     },
     showTagText: {
+        flex: 0.2,
         fontSize: 18,
-        width: 200,
+        width: deviceWidth * 0.7,
         marginBottom: 10,
         textAlign: "center",
+        justifyContent: "center",
+        alignSelf: "center",
     },
     showTagItemText: {
+        flex: 0.1,
         fontSize: 16,
-        width: 200,
+        width: deviceWidth * 0.7,
         marginBottom: 5,
         textAlign: "center",
+        justifyContent: "center",
+        alignSelf: "center",
     },
 });
 

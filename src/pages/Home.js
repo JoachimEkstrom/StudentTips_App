@@ -1,4 +1,4 @@
-import React, { component } from "react";
+import React from "react";
 import { StyleSheet, Image, TextInput, ToastAndroid, Dimensions } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Container, Button, Text, Icon } from "native-base";
@@ -6,6 +6,7 @@ import { useObserver } from "mobx-react-lite";
 import "react-native-gesture-handler";
 import * as Fetching from "../components/fetching";
 import { useEffect, useState } from "react";
+import store from "../store/store";
 import * as Location from "expo-location";
 import Logo from "../img/Logo.png";
 
@@ -37,8 +38,15 @@ function Home({ navigation }) {
 
         let message = await Fetching.login(user);
         showToast(message.message);
+        console.log(message);
+
         if (message.loggedIn === true) {
+            console.log("sdfsg");
+
+            let userImage = await Fetching.getUserImage(message.userId);
+            store.saveUserImage(userImage);
             resetFields();
+            console.log("asd");
             navigation.navigate("Map");
         }
     }
@@ -137,6 +145,9 @@ const styles = StyleSheet.create({
     },
     button: {
         marginTop: deviceHeight * 0.015,
+        width: deviceWidth * 0.6,
+        justifyContent: "center",
+        alignSelf: "center",
     },
     fields: {
         flex: 0.4,
