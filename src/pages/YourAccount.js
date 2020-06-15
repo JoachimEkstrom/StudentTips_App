@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, ToastAndroid, Dimensions, StatusBar } from "react-native";
+import { StyleSheet, ToastAndroid, Dimensions, StatusBar, View, Image } from "react-native";
 import { Container, Button, Text, Header, Icon } from "native-base";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useObserver } from "mobx-react-lite";
@@ -9,19 +9,15 @@ import * as Fetching from "../components/fetching";
 
 function YourAccount({ navigation }) {
     const [UserName, setUserName] = useState("");
+    let user = store.getCurrentUser;
+    console.log(user);
 
     function ListPin() {
         let pins = store.getMapPins;
-        let user = store.getCurrentUser;
+        user = store.getCurrentUser;
         return pins.map((pin, index) => {
             if (pin.pinUser === user.userId) {
-                return (
-                    <ListYourPins
-                        key={index}
-                        index={index}
-                        id={pin.pinTitle}
-                    ></ListYourPins>
-                );
+                return <ListYourPins key={index} index={index} id={pin.pinTitle}></ListYourPins>;
             } else {
                 return null;
             }
@@ -29,7 +25,7 @@ function YourAccount({ navigation }) {
     }
 
     async function logout() {
-        let user = store.getCurrentUser;
+        user = store.getCurrentUser;
         let message = await Fetching.logout(user.token);
         showToast(message.message);
         if (message.loggedOut === true) {
@@ -42,7 +38,8 @@ function YourAccount({ navigation }) {
     }
 
     useEffect(() => {
-        let user = store.getCurrentUser;
+        user = store.getCurrentUser;
+
         setUserName(user.userName);
     }, []);
 
@@ -51,6 +48,16 @@ function YourAccount({ navigation }) {
             <StatusBar backgroundColor="#F77F00" />
             <Header style={styles.header}>
                 <Text style={styles.headerText}>{UserName}'s Pins</Text>
+                {/* { !== null && (
+                    <View>
+                        <Image
+                            source={{
+                                uri: UserImage,
+                            }}
+                            style={styles.image}
+                        ></Image>
+                    </View>
+                )} */}
             </Header>
             <KeyboardAwareScrollView
                 enableOnAndroid={true}
@@ -61,13 +68,7 @@ function YourAccount({ navigation }) {
                 {ListPin()}
             </KeyboardAwareScrollView>
             <Container style={styles.container}>
-                <Button
-                    iconLeft
-                    danger
-                    rounded
-                    color="#F77F00"
-                    onPress={() => logout()}
-                >
+                <Button iconLeft danger rounded color="#F77F00" onPress={() => logout()}>
                     <Icon name="log-out" />
                     <Text>Logout</Text>
                 </Button>

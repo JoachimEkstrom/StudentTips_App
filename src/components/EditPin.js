@@ -1,5 +1,15 @@
 import React from "react";
-import { StyleSheet, TextInput, View, FlatList, Modal, Image, TouchableHighlight, Dimensions } from "react-native";
+import {
+    StyleSheet,
+    TextInput,
+    View,
+    FlatList,
+    Modal,
+    Image,
+    TouchableHighlight,
+    Dimensions,
+    KeyboardAvoidingView,
+} from "react-native";
 import {
     Container,
     Button,
@@ -115,183 +125,180 @@ function EditPin(props) {
                 <Text>Edit pin</Text>
             </Button>
             <Content keyboardShouldPersistTaps="never">
-                <Modal animationType="slide" transparent={true} visible={openModalVisible}>
+                <Modal animationType="slide" transparent={true} visible={openModalVisible} style={styles.modal}>
                     <View style={styles.centeredView}>
                         <Container style={styles.modalView}>
-                            <Container>
-                                <Container style={styles.modalContent}>
-                                    <Form>
-                                        <Item fixedLabel last>
-                                            <Label>Title:</Label>
-                                            <Input onChangeText={(text) => setPinTitle(text)} value={PinTitle} />
-                                        </Item>
-                                        <Item fixedLabel last>
-                                            <Label>Description:</Label>
-                                            <Input
-                                                onChangeText={(text) => setPinDescription(text)}
-                                                value={PinDescription}
-                                            />
-                                        </Item>
-                                    </Form>
-                                </Container>
-                                {/* Edit Tags */}
-                                <Container style={styles.flatlistContainer}>
-                                    <FlatList
-                                        style={styles.flatlist}
-                                        data={Tags}
-                                        extraData={Tags}
-                                        renderItem={({ item }) => (
-                                            <Container style={styles.listContainer}>
-                                                <Text style={styles.tagText}>{item}</Text>
-                                                <Button
-                                                    iconLeft
-                                                    rounded
-                                                    danger
-                                                    style={styles.tagButton}
-                                                    onPress={() => {
-                                                        for (let i = 0; i < Tags.length; i++) {
-                                                            if (item == Tags[i]) {
-                                                                Tags.splice(i, 1);
-                                                                setTags(JSON.parse(JSON.stringify(Tags)));
-                                                            }
+                            <Container style={styles.modalContent}>
+                                <Form>
+                                    <Item fixedLabel last>
+                                        <Label>Title:</Label>
+                                        <Input onChangeText={(text) => setPinTitle(text)} value={PinTitle} />
+                                    </Item>
+                                    <Item fixedLabel last>
+                                        <Label>Description:</Label>
+                                        <Input
+                                            onChangeText={(text) => setPinDescription(text)}
+                                            value={PinDescription}
+                                        />
+                                    </Item>
+                                </Form>
+                            </Container>
+                            {/* Edit Tags */}
+                            <Container style={styles.flatlistContainer}>
+                                <FlatList
+                                    style={styles.flatlist}
+                                    data={Tags}
+                                    extraData={Tags}
+                                    renderItem={({ item }) => (
+                                        <Container style={styles.listContainer}>
+                                            <Text style={styles.tagText}>{item}</Text>
+                                            <Button
+                                                iconLeft
+                                                rounded
+                                                danger
+                                                style={styles.tagButton}
+                                                onPress={() => {
+                                                    for (let i = 0; i < Tags.length; i++) {
+                                                        if (item == Tags[i]) {
+                                                            Tags.splice(i, 1);
+                                                            setTags(JSON.parse(JSON.stringify(Tags)));
                                                         }
-                                                    }}
-                                                >
-                                                    <Icon name="trash" style={styles.tagIcon} />
-                                                </Button>
-                                            </Container>
-                                        )}
-                                        keyExtractor={(item, index) => index.toString()}
-                                    ></FlatList>
-                                </Container>
-                                <Container style={styles.addTag}>
-                                    <Form style={styles.addTagForm}>
-                                        <Item fixedLabel last style={styles.addTagItem}>
-                                            <Label style={styles.addTagLable}>Add tag:</Label>
-                                            <Input
-                                                style={styles.addTagInput}
-                                                onChangeText={(text) => setTagText(text)}
-                                                value={TagText}
-                                            />
-                                        </Item>
-                                    </Form>
-                                    <Button
-                                        iconLeft
-                                        rounded
-                                        success
-                                        style={styles.addTagButton}
-                                        onPress={() => {
-                                            setTags([...Tags, TagText]);
-                                            setTagText("");
-                                        }}
-                                    >
-                                        <Icon name="add" style={styles.tagIcon} />
-                                    </Button>
-                                </Container>
+                                                    }
+                                                }}
+                                            >
+                                                <Icon name="trash" style={styles.tagIcon} />
+                                            </Button>
+                                        </Container>
+                                    )}
+                                    keyExtractor={(item, index) => index.toString()}
+                                ></FlatList>
+                            </Container>
+                            <Container style={styles.addTag}>
+                                <Form style={styles.addTagForm}>
+                                    <Item fixedLabel last style={styles.addTagItem}>
+                                        <Label style={styles.addTagLable}>Add tag:</Label>
+                                        <Input
+                                            style={styles.addTagInput}
+                                            onChangeText={(text) => setTagText(text)}
+                                            value={TagText}
+                                        />
+                                    </Item>
+                                </Form>
+                                <Button
+                                    iconLeft
+                                    rounded
+                                    success
+                                    style={styles.addTagButton}
+                                    onPress={() => {
+                                        setTags([...Tags, TagText]);
+                                        setTagText("");
+                                    }}
+                                >
+                                    <Icon name="add" style={styles.tagIcon} />
+                                </Button>
                             </Container>
 
-                            <Container>
-                                <Container style={styles.lowerParts}>
-                                    {(thisPin.pinImage !== null || updated === true) && (
-                                        <>
-                                            <Container style={styles.imageContainer}>
-                                                {updated === false && (
-                                                    <Image
-                                                        source={{
-                                                            uri: thisPin.pinImage,
-                                                        }}
-                                                        style={styles.image}
-                                                    ></Image>
-                                                )}
-                                                {updated === true && (
-                                                    <Image
-                                                        source={{
-                                                            uri: Img.uri,
-                                                        }}
-                                                        style={styles.image}
-                                                    ></Image>
-                                                )}
-                                            </Container>
-                                            <Button
-                                                iconLeft
-                                                rounded
-                                                info
-                                                onPress={() => {
-                                                    updateImage();
-                                                }}
-                                            >
-                                                <Icon name="image" />
-                                                <Text>Change picture</Text>
-                                            </Button>
-                                        </>
-                                    )}
-                                    {/* if no picture add one. */}
-                                    {thisPin.pinImage === null && updated === false && (
-                                        <>
-                                            <Container style={styles.imageContainer}>
-                                                {updated === true && (
-                                                    <Image
-                                                        source={{
-                                                            uri: Img.uri,
-                                                        }}
-                                                        style={styles.image}
-                                                    ></Image>
-                                                )}
-                                            </Container>
-                                            <Button
-                                                iconLeft
-                                                rounded
-                                                info
-                                                style={styles.buttons}
-                                                onPress={() => {
-                                                    updateImage();
-                                                }}
-                                            >
-                                                <Icon name="image" />
-                                                <Text>Add picture</Text>
-                                            </Button>
-                                        </>
-                                    )}
+                            <Container style={styles.lowerParts}>
+                                {(thisPin.pinImage !== null || updated === true) && (
+                                    <>
+                                        <Container style={styles.imageContainer}>
+                                            {updated === false && (
+                                                <Image
+                                                    source={{
+                                                        uri: thisPin.pinImage,
+                                                    }}
+                                                    style={styles.image}
+                                                ></Image>
+                                            )}
+                                            {updated === true && (
+                                                <Image
+                                                    source={{
+                                                        uri: Img.uri,
+                                                    }}
+                                                    style={styles.image}
+                                                ></Image>
+                                            )}
+                                        </Container>
+                                        <Button
+                                            iconLeft
+                                            rounded
+                                            info
+                                            style={styles.buttons}
+                                            onPress={() => {
+                                                updateImage();
+                                            }}
+                                        >
+                                            <Icon name="image" />
+                                            <Text>Change picture</Text>
+                                        </Button>
+                                    </>
+                                )}
+                                {/* if no picture add one. */}
+                                {thisPin.pinImage === null && updated === false && (
+                                    <>
+                                        <Container style={styles.imageContainer}>
+                                            {updated === true && (
+                                                <Image
+                                                    source={{
+                                                        uri: Img.uri,
+                                                    }}
+                                                    style={styles.image}
+                                                ></Image>
+                                            )}
+                                        </Container>
+                                        <Button
+                                            iconLeft
+                                            rounded
+                                            info
+                                            style={styles.buttons}
+                                            onPress={() => {
+                                                updateImage();
+                                            }}
+                                        >
+                                            <Icon name="image" />
+                                            <Text>Add picture</Text>
+                                        </Button>
+                                    </>
+                                )}
 
-                                    {/* Update pin */}
-                                    <Button
-                                        iconLeft
-                                        rounded
-                                        style={styles.buttons}
-                                        onPress={() => {
-                                            UpdatePin();
-                                        }}
-                                    >
-                                        <Icon name="settings" />
-                                        <Text>Update pin</Text>
-                                    </Button>
-                                    {/* Close modal */}
-                                    <Button
-                                        iconLeft
-                                        rounded
-                                        warning
-                                        style={styles.buttons}
-                                        onPress={() => {
-                                            closeModal();
-                                        }}
-                                    >
-                                        <Icon name="arrow-back" />
-                                        <Text>Discard changes and close</Text>
-                                    </Button>
-                                    {/* Delete pin  */}
-                                    <Button
-                                        iconLeft
-                                        rounded
-                                        danger
-                                        style={styles.buttons}
-                                        onPress={() => {
-                                            deletePin();
-                                        }}
-                                    >
-                                        <Icon name="trash" />
-                                        <Text>Delete this pin</Text>
-                                    </Button>
-                                </Container>
+                                {/* Update pin */}
+                                <Button
+                                    iconLeft
+                                    rounded
+                                    style={styles.buttons}
+                                    onPress={() => {
+                                        UpdatePin();
+                                    }}
+                                >
+                                    <Icon name="settings" />
+                                    <Text>Update pin</Text>
+                                </Button>
+                                {/* Close modal */}
+                                <Button
+                                    iconLeft
+                                    rounded
+                                    warning
+                                    style={styles.buttons}
+                                    onPress={() => {
+                                        closeModal();
+                                    }}
+                                >
+                                    <Icon name="arrow-back" />
+                                    <Text>Discard changes and close</Text>
+                                </Button>
+                                {/* Delete pin  */}
+                                <Button
+                                    iconLeft
+                                    rounded
+                                    danger
+                                    style={styles.buttons}
+                                    onPress={() => {
+                                        deletePin();
+                                    }}
+                                >
+                                    <Icon name="trash" />
+                                    <Text>Delete this pin</Text>
+                                </Button>
                             </Container>
                         </Container>
                     </View>
@@ -318,13 +325,14 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginTop: 0,
     },
+
     modalView: {
-        // flex: 1,
+        flex: 1,
         flexDirection: "column",
         height: deviceHeight * 0.95,
         width: deviceWidth * 0.95,
         margin: 10,
-        backgroundColor: "white",
+        backgroundColor: "#FFF9C4",
         borderRadius: 20,
         padding: 20,
         alignItems: "center",
@@ -341,27 +349,30 @@ const styles = StyleSheet.create({
         flex: 0.3,
         height: 30,
         width: 330,
+        backgroundColor: "#FFF9C4",
     },
     flatlistContainer: {
-        marginTop: 5,
-        flex: 0.5,
-        height: 70,
+        marginTop: 10,
+        flex: 0.3,
+        height: 20,
         width: 330,
         flexDirection: "column",
         justifyContent: "center",
-        alignItems: "center",
+        alignSelf: "stretch",
     },
     flatlist: {
         flex: 1,
-        height: 40,
+        height: 30,
         width: 330,
+        backgroundColor: "#FFF9C4",
     },
     listContainer: {
         flex: 0.1,
-        height: 40,
+        height: 30,
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
+        backgroundColor: "#FFF9C4",
     },
     tagText: {
         flex: 0.8,
@@ -390,10 +401,11 @@ const styles = StyleSheet.create({
     },
     addTag: {
         marginTop: 10,
-        flex: 0.2,
-        height: 70,
+        flex: 0.1,
+        height: 50,
         width: 330,
         flexDirection: "row",
+        backgroundColor: "#FFF9C4",
     },
     addTagForm: {
         flex: 0.8,
@@ -401,7 +413,7 @@ const styles = StyleSheet.create({
         width: 200,
     },
     addTagItem: {
-        flex: 1,
+        flex: 0.5,
         height: 50,
         width: 330,
         textAlign: "center",
@@ -430,8 +442,10 @@ const styles = StyleSheet.create({
         alignSelf: "center",
     },
     lowerParts: {
-        justifyContent: "center",
+        flex: 0.5,
+        justifyContent: "flex-end",
         alignItems: "center",
+        backgroundColor: "#FFF9C4",
     },
     imageContainer: {
         flex: 1,
@@ -440,14 +454,22 @@ const styles = StyleSheet.create({
     },
     image: {
         flex: 1,
-        height: 180,
-        width: 180,
+        height: 200,
+        width: 200,
         resizeMode: "contain",
         justifyContent: "center",
         alignSelf: "center",
+        backgroundColor: "#FFF9C4",
     },
     buttons: {
         marginTop: 5,
+        flex: 0.8,
+        justifyContent: "center",
+        alignSelf: "center",
+        width: 300,
+    },
+    button: {
+        backgroundColor: "#1976D2",
     },
 });
 

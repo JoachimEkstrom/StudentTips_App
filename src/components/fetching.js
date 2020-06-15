@@ -159,6 +159,17 @@ async function login(user) {
     return message;
 }
 
+async function getUserImage(user) {
+    let image = null;
+
+    await fetch(`http://116.203.125.0:12001/users/${user}`)
+        .then((response) => response.json())
+        .then((result) => {
+            image = result.userImage;
+            return image;
+        });
+}
+
 async function logout(token) {
     let message;
     await fetch(`http://116.203.125.0:12001/logout`, {
@@ -174,6 +185,7 @@ async function logout(token) {
                     userName: "",
                     token: "",
                     userId: "",
+                    userImage: null,
                 });
                 setToken("", "");
                 message.loggedOut = true;
@@ -190,4 +202,5 @@ module.exports = {
     addNewUser,
     login,
     logout,
+    getUserImage,
 };

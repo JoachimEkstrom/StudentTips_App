@@ -139,14 +139,16 @@ const styles = StyleSheet.create({
         marginTop: deviceHeight * 0.015,
     },
     fields: {
+        flex: 0.4,
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
         width: deviceWidth * 0.75,
-        height: deviceHeight * 0.03,
+        height: deviceHeight * 0.02,
         marginTop: deviceHeight * 0.015,
         marginBottom: deviceHeight * 0.005,
         borderRadius: deviceHeight * 0.03,
+        backgroundColor: "#FFF9C4",
     },
 });
 

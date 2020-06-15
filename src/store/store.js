@@ -54,6 +54,7 @@ const store = observable({
         userName: "",
         token: "",
         userId: "",
+        userImage: null,
     },
     modalinfo: {
         pinTitle: "",
