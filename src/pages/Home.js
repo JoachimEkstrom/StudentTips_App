@@ -1,11 +1,5 @@
 import React, { component } from "react";
-import {
-    StyleSheet,
-    Image,
-    TextInput,
-    ToastAndroid,
-    Dimensions,
-} from "react-native";
+import { StyleSheet, Image, TextInput, ToastAndroid, Dimensions } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Container, Button, Text, Icon } from "native-base";
 import { useObserver } from "mobx-react-lite";
@@ -61,15 +55,11 @@ function Home({ navigation }) {
             <Container style={styles.container}>
                 {errorMsg && <Text>{errorMsg}</Text>}
                 <Image source={Logo} style={styles.image}></Image>
-                <Text style={styles.textH1}>Welcome to TopTip!</Text>
+                <Text style={styles.textH1}>Welcome to TipTop!</Text>
 
                 <Container style={styles.fields}>
                     <Text style={styles.text}>Username: </Text>
-                    <TextInput
-                        style={styles.textInput}
-                        onChangeText={(text) => setUserName(text)}
-                        value={UserName}
-                    />
+                    <TextInput style={styles.textInput} onChangeText={(text) => setUserName(text)} value={UserName} />
                 </Container>
                 <Container style={styles.fields}>
                     <Text style={styles.text}>Password: </Text>

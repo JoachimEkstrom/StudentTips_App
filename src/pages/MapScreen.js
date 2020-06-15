@@ -1,15 +1,6 @@
 import React, { component } from "react";
-import {
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
-    FlatList,
-    Modal,
-    Image,
-    TouchableHighlight,
-    Dimensions,
-} from "react-native";
+import { StyleSheet, View, FlatList, Modal, Image, Dimensions, KeyboardAvoidingView } from "react-native";
+import { Container, Button, Text, Input, Content, Form, Label, Item, Icon } from "native-base";
 import { useObserver } from "mobx-react-lite";
 import store from "../store/store";
 import { useEffect, useState } from "react";
@@ -34,9 +25,7 @@ function MapScreen({ navigation }) {
     let user = store.getCurrentUser;
     let renderPins = store.getMapPins;
 
-    MapboxGL.setAccessToken(
-        "pk.eyJ1IjoianN1bGFiIiwiYSI6ImNrYWY1bmplbjAxNDIyc3E4NmY5NzJzYjkifQ.PJ74G61aNg65BGB06Et3NA"
-    );
+    MapboxGL.setAccessToken("pk.eyJ1IjoianN1bGFiIiwiYSI6ImNrYWY1bmplbjAxNDIyc3E4NmY5NzJzYjkifQ.PJ74G61aNg65BGB06Et3NA");
 
     async function mapPressedFunc(event) {
         const { geometry } = event;
@@ -61,10 +50,7 @@ function MapScreen({ navigation }) {
         pin.append("pinDescription", PinDescription);
         pin.append("pinImage", PinImage);
         pin.append("pinTags", JSON.stringify(Tags));
-        pin.append(
-            "pinCoordinates",
-            JSON.stringify({ x: MapPressed.longitude, y: MapPressed.latitude })
-        );
+        pin.append("pinCoordinates", JSON.stringify({ x: MapPressed.longitude, y: MapPressed.latitude }));
 
         await Fetching.addPinToDb(pin, user.token);
 
@@ -86,6 +72,15 @@ function MapScreen({ navigation }) {
         setOpenModalVisible(true);
     }
 
+    function closeModal() {
+        setModalVisible(!modalVisible);
+        setPinTitle("");
+        setPinDescription("");
+        setTags([]);
+        setTagText("");
+        setPinImage(null);
+    }
+
     function renderThePins() {
         renderPins = store.getMapPins;
         return renderPins.map((pin, index) => {
@@ -93,10 +88,7 @@ function MapScreen({ navigation }) {
                 <MapboxGL.PointAnnotation
                     key={index}
                     onSelected={() => openPin(index)}
-                    coordinate={[
-                        Number(pin.pinCoordinates.x),
-                        Number(pin.pinCoordinates.y),
-                    ]}
+                    coordinate={[Number(pin.pinCoordinates.x), Number(pin.pinCoordinates.y)]}
                     id={pin.pinTitle}
                 ></MapboxGL.PointAnnotation>
             );
@@ -104,23 +96,18 @@ function MapScreen({ navigation }) {
     }
 
     function addImages() {
-        ImagePicker.showImagePicker(
-            { maxWidth: 500, maxHeight: 500 },
-            (response) => {
-                if (response.didCancel) {
-                    return;
-                }
-
-                const image = {
-                    uri: response.uri,
-                    type: response.type,
-                    name:
-                        response.fileName ||
-                        response.uri.substr(response.uri.lastIndexOf("/") + 1),
-                };
-                setPinImage(image);
+        ImagePicker.showImagePicker({ maxWidth: 500, maxHeight: 500 }, (response) => {
+            if (response.didCancel) {
+                return;
             }
-        );
+
+            const image = {
+                uri: response.uri,
+                type: response.type,
+                name: response.fileName || response.uri.substr(response.uri.lastIndexOf("/") + 1),
+            };
+            setPinImage(image);
+        });
     }
     useFocusEffect(() => {
         renderThePins();
@@ -133,207 +120,145 @@ function MapScreen({ navigation }) {
     return useObserver(() => (
         <View style={styles.page}>
             <View style={styles.container}>
-                <MapboxGL.MapView
-                    onPress={mapPressedFunc}
-                    style={styles.map}
-                    preferredFramesPerSecond={10}
-                >
-                    <MapboxGL.Camera
-                        followUserLocation={followUserLocation}
-                        followUserMode={followUserMode}
-                    />
+                <MapboxGL.MapView onPress={mapPressedFunc} style={styles.map} preferredFramesPerSecond={10}>
+                    <MapboxGL.Camera followUserLocation={followUserLocation} followUserMode={followUserMode} />
                     {renderThePins()}
 
                     <MapboxGL.UserLocation visible={true} />
                 </MapboxGL.MapView>
             </View>
             {/* Create new Pin Modal  */}
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-            >
-                <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                        <Text style={styles.modalText}>
-                            Add new Location Pin!
-                        </Text>
+            <KeyboardAvoidingView behaviour="position" enabled={true}>
+                <Modal animationType="slide" transparent={true} visible={modalVisible}>
+                    <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                            <Text style={styles.modalText}>Add new Location Pin!</Text>
 
-                        {/* PinTitle */}
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Text style={{ fontSize: 20, textAlign: "center" }}>
-                                Title:{" "}
-                            </Text>
-                            <TextInput
-                                style={{
-                                    height: 40,
-                                    width: 80,
-                                    borderColor: "gray",
-                                    borderWidth: 1,
-                                    fontSize: 16,
-                                }}
-                                onChangeText={(text) => setPinTitle(text)}
-                                value={PinTitle}
-                            />
-                        </View>
+                            <Form style={styles.form}>
+                                <Item fixedLabel>
+                                    <Label style={styles.lable}>Title:</Label>
+                                    <Input onChangeText={(text) => setPinTitle(text)} value={PinTitle} />
+                                </Item>
+                                <Item fixedLabel>
+                                    <Label style={styles.lable}>Description:</Label>
+                                    <Input onChangeText={(text) => setPinDescription(text)} value={PinDescription} />
+                                </Item>
+                            </Form>
+                            {/* tags */}
 
-                        {/* PinDescription */}
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Text style={{ fontSize: 20, textAlign: "center" }}>
-                                Description:{" "}
-                            </Text>
-                            <TextInput
+                            <View
                                 style={{
-                                    height: 40,
-                                    width: 80,
-                                    borderColor: "gray",
-                                    borderWidth: 1,
-                                    fontSize: 16,
-                                }}
-                                onChangeText={(text) => setPinDescription(text)}
-                                value={PinDescription}
-                            />
-                        </View>
-
-                        {/* tags */}
-
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Text style={{ fontSize: 20, textAlign: "center" }}>
-                                Tags:{" "}
-                            </Text>
-                            <TextInput
-                                style={{
-                                    height: 40,
-                                    width: 80,
-                                    borderColor: "gray",
-                                    borderWidth: 1,
-                                    fontSize: 16,
-                                }}
-                                onChangeText={(text) => setTagText(text)}
-                                value={TagText}
-                            />
-                            <TouchableHighlight
-                                style={{
-                                    ...styles.openButton,
-                                    backgroundColor: "#2196F3",
-                                }}
-                                onPress={() => {
-                                    addtag();
+                                    flexDirection: "row",
+                                    justifyContent: "center",
                                 }}
                             >
-                                <Text style={styles.textStyle}>Add tag</Text>
-                            </TouchableHighlight>
-                        </View>
-                        {/* display tags */}
-                        <View style={styles.flatlist}>
-                            <FlatList
-                                data={Tags}
-                                renderItem={({ item }) => (
-                                    <View>
-                                        <Text>{item}</Text>
-                                    </View>
-                                )}
-                                keyExtractor={(item, index) => index.toString()}
-                            ></FlatList>
-                        </View>
-                        {/* render images */}
-                        {PinImage !== null && (
-                            <View>
-                                <Image
-                                    source={{
-                                        uri: PinImage.uri,
-                                    }}
-                                    style={styles.image}
-                                ></Image>
+                                <Form style={styles.form}>
+                                    <Item fixedLabel>
+                                        <Label style={styles.taglable}>Tags:</Label>
+                                        <Input
+                                            style={styles.input}
+                                            onChangeText={(text) => setTagText(text)}
+                                            value={TagText}
+                                        />
+                                        <Button
+                                            iconLeft
+                                            rounded
+                                            success
+                                            style={styles.addTagButton}
+                                            onPress={() => {
+                                                addtag();
+                                            }}
+                                        >
+                                            <Icon name="add" style={styles.tagIcon} />
+                                        </Button>
+                                    </Item>
+                                </Form>
                             </View>
-                        )}
+                            {/* display tags */}
+                            <View style={styles.flatlist}>
+                                <FlatList
+                                    data={Tags}
+                                    renderItem={({ item }) => (
+                                        <View>
+                                            <Text>{item}</Text>
+                                        </View>
+                                    )}
+                                    keyExtractor={(item, index) => index.toString()}
+                                ></FlatList>
+                            </View>
 
-                        {/* Add picutures */}
-                        <View>
-                            <TouchableHighlight
-                                style={{
-                                    ...styles.openButton,
-                                    backgroundColor: "#2196F3",
-                                }}
+                            {/* render images */}
+                            {PinImage !== null && (
+                                <View>
+                                    <Image
+                                        source={{
+                                            uri: PinImage.uri,
+                                        }}
+                                        style={styles.image}
+                                    ></Image>
+                                </View>
+                            )}
+
+                            {/* Add picutures */}
+                            <View>
+                                <Button
+                                    iconLeft
+                                    rounded
+                                    info
+                                    style={styles.buttons}
+                                    onPress={() => {
+                                        addImages();
+                                    }}
+                                >
+                                    <Icon name="image" />
+                                    <Text>Add picture</Text>
+                                </Button>
+                            </View>
+                            <Button
+                                iconLeft
+                                rounded
+                                success
+                                style={styles.buttons}
                                 onPress={() => {
-                                    addImages();
+                                    saveNewPin();
+                                    setModalVisible(!modalVisible);
                                 }}
                             >
-                                <Text style={styles.textStyle}>
-                                    Add Pictures
-                                </Text>
-                            </TouchableHighlight>
-                        </View>
-                        <TouchableHighlight
-                            style={{
-                                ...styles.openButton,
-                                backgroundColor: "#2196F3",
-                            }}
-                            onPress={() => {
-                                saveNewPin();
-                                setModalVisible(!modalVisible);
-                            }}
-                        >
-                            <Text style={styles.textStyle}>Save and close</Text>
-                        </TouchableHighlight>
+                                <Icon name="add" />
+                                <Text>Save and close</Text>
+                            </Button>
 
-                        {/* Close modal */}
-                        <TouchableHighlight
-                            style={{
-                                ...styles.openButton,
-                                backgroundColor: "#2196F3",
-                            }}
-                            onPress={() => {
-                                setPinImage(null);
-                                setModalVisible(!modalVisible);
-                            }}
-                        >
-                            <Text style={styles.textStyle}>
-                                Close without save
-                            </Text>
-                        </TouchableHighlight>
+                            {/* Close modal */}
+                            <Button
+                                iconLeft
+                                rounded
+                                warning
+                                style={styles.buttons}
+                                onPress={() => {
+                                    closeModal();
+                                }}
+                            >
+                                <Icon name="arrow-back" />
+                                <Text>Close without save</Text>
+                            </Button>
+                        </View>
                     </View>
-                </View>
-            </Modal>
+                </Modal>
+            </KeyboardAvoidingView>
 
             {/* Open the modal clicked on */}
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={openModalVisible}
-            >
+            <Modal animationType="slide" transparent={true} visible={openModalVisible}>
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <Text style={styles.modalText}>
-                            Title: {modal.pinTitle}
-                        </Text>
-                        <Text style={styles.modalText}>
-                            Latitude: {modal.pinCoordinates.y}
-                        </Text>
-                        <Text style={styles.modalText}>
-                            Longitude: {modal.pinCoordinates.x}
-                        </Text>
+                        <Text style={styles.showTagTitleText}>{modal.pinTitle}</Text>
+                        <Text style={styles.showTagDescriptionText}>{modal.pinDescription}</Text>
                         <View style={styles.flatlist}>
+                            <Text style={styles.showTagText}>Tags:</Text>
                             <FlatList
                                 data={modal.pinTags}
                                 renderItem={({ item }) => (
                                     <View>
-                                        <Text>{item}</Text>
+                                        <Text style={styles.showTagItemText}>{item}</Text>
                                     </View>
                                 )}
                                 keyExtractor={(item, index) => index.toString()}
@@ -351,17 +276,18 @@ function MapScreen({ navigation }) {
                             </View>
                         )}
                         {/* Close modal */}
-                        <TouchableHighlight
-                            style={{
-                                ...styles.openButton,
-                                backgroundColor: "#2196F3",
-                            }}
+                        <Button
+                            iconLeft
+                            rounded
+                            warning
+                            style={styles.buttons}
                             onPress={() => {
                                 setOpenModalVisible(!openModalVisible);
                             }}
                         >
-                            <Text style={styles.textStyle}>close</Text>
-                        </TouchableHighlight>
+                            <Icon name="arrow-back" />
+                            <Text>Close</Text>
+                        </Button>
                     </View>
                 </View>
             </Modal>
@@ -389,8 +315,28 @@ const styles = StyleSheet.create({
     map: {
         flex: 1,
     },
-    flatlist: {
+    form: {
+        flex: 1,
+        width: 300,
         height: 100,
+        marginBottom: 10,
+        justifyContent: "center",
+    },
+    lable: {
+        justifyContent: "center",
+    },
+    taglable: {
+        flex: 0.2,
+        width: 30,
+        justifyContent: "center",
+    },
+    input: {
+        width: 100,
+        flex: 0.6,
+    },
+    flatlist: {
+        height: 150,
+        width: 200,
     },
     image: {
         height: 200,
@@ -417,12 +363,35 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
+        justifyContent: "flex-start",
+    },
+    buttons: {
+        marginBottom: 5,
     },
     openButton: {
         backgroundColor: "#F194FF",
         borderRadius: 20,
         padding: 10,
         elevation: 2,
+    },
+    addTagButton: {
+        flex: 0.2,
+        height: 30,
+        width: 30,
+        borderRadius: 20,
+        padding: 0,
+        marginRight: 5,
+        marginBottom: 0,
+        justifyContent: "center",
+        alignSelf: "center",
+    },
+    tagIcon: {
+        height: 30,
+        width: 30,
+        marginLeft: 15,
+        marginTop: 5,
+        justifyContent: "center",
+        alignSelf: "center",
     },
     textStyle: {
         color: "white",
@@ -431,6 +400,30 @@ const styles = StyleSheet.create({
     },
     modalText: {
         marginBottom: 15,
+        textAlign: "center",
+    },
+    showTagTitleText: {
+        fontSize: 30,
+        width: 200,
+        marginBottom: 10,
+        textAlign: "center",
+    },
+    showTagDescriptionText: {
+        fontSize: 20,
+        width: 200,
+        marginBottom: 20,
+        textAlign: "center",
+    },
+    showTagText: {
+        fontSize: 18,
+        width: 200,
+        marginBottom: 10,
+        textAlign: "center",
+    },
+    showTagItemText: {
+        fontSize: 16,
+        width: 200,
+        marginBottom: 5,
         textAlign: "center",
     },
 });

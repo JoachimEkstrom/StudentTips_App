@@ -1,14 +1,5 @@
 import React from "react";
-import {
-    StyleSheet,
-    TextInput,
-    View,
-    FlatList,
-    Modal,
-    Image,
-    TouchableHighlight,
-    Dimensions,
-} from "react-native";
+import { StyleSheet, TextInput, View, FlatList, Modal, Image, TouchableHighlight, Dimensions } from "react-native";
 import {
     Container,
     Button,
@@ -74,25 +65,20 @@ function EditPin(props) {
     }
 
     function updateImage() {
-        ImagePicker.showImagePicker(
-            { maxWidth: 500, maxHeight: 500 },
-            (response) => {
-                if (response.didCancel) {
-                    return;
-                }
-
-                const image = {
-                    uri: response.uri,
-                    type: response.type,
-                    name:
-                        response.fileName ||
-                        response.uri.substr(response.uri.lastIndexOf("/") + 1),
-                };
-
-                setImg(image);
-                setupdated(true);
+        ImagePicker.showImagePicker({ maxWidth: 500, maxHeight: 500 }, (response) => {
+            if (response.didCancel) {
+                return;
             }
-        );
+
+            const image = {
+                uri: response.uri,
+                type: response.type,
+                name: response.fileName || response.uri.substr(response.uri.lastIndexOf("/") + 1),
+            };
+
+            setImg(image);
+            setupdated(true);
+        });
     }
 
     function closeModal() {
@@ -105,6 +91,11 @@ function EditPin(props) {
     }
 
     function deletePin() {
+        setPinTitle(thisPin.pinTitle);
+        setPinDescription(thisPin.pinDescription);
+        setTags(copyPin.pinTags);
+        setImg(null);
+        setupdated(false);
         Fetching.deletePinInDb(thisPin.pinId, user.token);
         store.deleteOneMapPin(props.pinIndex);
         setOpenModalVisible(!openModalVisible);
@@ -112,23 +103,19 @@ function EditPin(props) {
 
     return useObserver(() => (
         <View style={styles.container}>
-            <Content>
-                <Button
-                    iconLeft
-                    style={styles.button}
-                    rounded
-                    onPress={() => {
-                        setOpenModalVisible(true);
-                    }}
-                >
-                    <Icon name="menu" />
-                    <Text>Edit pin</Text>
-                </Button>
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={openModalVisible}
-                >
+            <Button
+                iconLeft
+                style={styles.button}
+                rounded
+                onPress={() => {
+                    setOpenModalVisible(true);
+                }}
+            >
+                <Icon name="menu" />
+                <Text>Edit pin</Text>
+            </Button>
+            <Content keyboardShouldPersistTaps="never">
+                <Modal animationType="slide" transparent={true} visible={openModalVisible}>
                     <View style={styles.centeredView}>
                         <Container style={styles.modalView}>
                             <Container>
@@ -136,19 +123,12 @@ function EditPin(props) {
                                     <Form>
                                         <Item fixedLabel last>
                                             <Label>Title:</Label>
-                                            <Input
-                                                onChangeText={(text) =>
-                                                    setPinTitle(text)
-                                                }
-                                                value={PinTitle}
-                                            />
+                                            <Input onChangeText={(text) => setPinTitle(text)} value={PinTitle} />
                                         </Item>
                                         <Item fixedLabel last>
                                             <Label>Description:</Label>
                                             <Input
-                                                onChangeText={(text) =>
-                                                    setPinDescription(text)
-                                                }
+                                                onChangeText={(text) => setPinDescription(text)}
                                                 value={PinDescription}
                                             />
                                         </Item>
@@ -161,68 +141,36 @@ function EditPin(props) {
                                         data={Tags}
                                         extraData={Tags}
                                         renderItem={({ item }) => (
-                                            <Container
-                                                style={styles.listContainer}
-                                            >
-                                                <Text style={styles.tagText}>
-                                                    {item}
-                                                </Text>
+                                            <Container style={styles.listContainer}>
+                                                <Text style={styles.tagText}>{item}</Text>
                                                 <Button
                                                     iconLeft
                                                     rounded
                                                     danger
                                                     style={styles.tagButton}
                                                     onPress={() => {
-                                                        for (
-                                                            let i = 0;
-                                                            i < Tags.length;
-                                                            i++
-                                                        ) {
-                                                            if (
-                                                                item == Tags[i]
-                                                            ) {
-                                                                Tags.splice(
-                                                                    i,
-                                                                    1
-                                                                );
-                                                                setTags(
-                                                                    JSON.parse(
-                                                                        JSON.stringify(
-                                                                            Tags
-                                                                        )
-                                                                    )
-                                                                );
+                                                        for (let i = 0; i < Tags.length; i++) {
+                                                            if (item == Tags[i]) {
+                                                                Tags.splice(i, 1);
+                                                                setTags(JSON.parse(JSON.stringify(Tags)));
                                                             }
                                                         }
                                                     }}
                                                 >
-                                                    <Icon
-                                                        name="trash"
-                                                        style={styles.tagIcon}
-                                                    />
+                                                    <Icon name="trash" style={styles.tagIcon} />
                                                 </Button>
                                             </Container>
                                         )}
-                                        keyExtractor={(item, index) =>
-                                            index.toString()
-                                        }
+                                        keyExtractor={(item, index) => index.toString()}
                                     ></FlatList>
                                 </Container>
                                 <Container style={styles.addTag}>
                                     <Form style={styles.addTagForm}>
-                                        <Item
-                                            fixedLabel
-                                            last
-                                            style={styles.addTagItem}
-                                        >
-                                            <Label style={styles.addTagLable}>
-                                                New tag:
-                                            </Label>
+                                        <Item fixedLabel last style={styles.addTagItem}>
+                                            <Label style={styles.addTagLable}>Add tag:</Label>
                                             <Input
                                                 style={styles.addTagInput}
-                                                onChangeText={(text) =>
-                                                    setTagText(text)
-                                                }
+                                                onChangeText={(text) => setTagText(text)}
                                                 value={TagText}
                                             />
                                         </Item>
@@ -230,32 +178,27 @@ function EditPin(props) {
                                     <Button
                                         iconLeft
                                         rounded
-                                        style={styles.tagButton}
+                                        success
+                                        style={styles.addTagButton}
                                         onPress={() => {
                                             setTags([...Tags, TagText]);
                                             setTagText("");
                                         }}
                                     >
-                                        <Icon
-                                            name="add"
-                                            style={styles.tagIcon}
-                                        />
+                                        <Icon name="add" style={styles.tagIcon} />
                                     </Button>
                                 </Container>
                             </Container>
+
                             <Container>
                                 <Container style={styles.lowerParts}>
-                                    {(thisPin.pinImage !== null ||
-                                        updated === true) && (
+                                    {(thisPin.pinImage !== null || updated === true) && (
                                         <>
-                                            <Container
-                                                style={styles.imageContainer}
-                                            >
+                                            <Container style={styles.imageContainer}>
                                                 {updated === false && (
                                                     <Image
                                                         source={{
-                                                            uri:
-                                                                thisPin.pinImage,
+                                                            uri: thisPin.pinImage,
                                                         }}
                                                         style={styles.image}
                                                     ></Image>
@@ -272,46 +215,43 @@ function EditPin(props) {
                                             <Button
                                                 iconLeft
                                                 rounded
+                                                info
                                                 onPress={() => {
                                                     updateImage();
                                                 }}
                                             >
-                                                <Icon name="settings" />
+                                                <Icon name="image" />
                                                 <Text>Change picture</Text>
                                             </Button>
                                         </>
                                     )}
                                     {/* if no picture add one. */}
-                                    {thisPin.pinImage === null &&
-                                        updated === false && (
-                                            <>
-                                                <Container
-                                                    style={
-                                                        styles.imageContainer
-                                                    }
-                                                >
-                                                    {updated === true && (
-                                                        <Image
-                                                            source={{
-                                                                uri: Img.uri,
-                                                            }}
-                                                            style={styles.image}
-                                                        ></Image>
-                                                    )}
-                                                </Container>
-                                                <Button
-                                                    iconLeft
-                                                    rounded
-                                                    style={styles.buttons}
-                                                    onPress={() => {
-                                                        updateImage();
-                                                    }}
-                                                >
-                                                    <Icon name="settings" />
-                                                    <Text>Add picture</Text>
-                                                </Button>
-                                            </>
-                                        )}
+                                    {thisPin.pinImage === null && updated === false && (
+                                        <>
+                                            <Container style={styles.imageContainer}>
+                                                {updated === true && (
+                                                    <Image
+                                                        source={{
+                                                            uri: Img.uri,
+                                                        }}
+                                                        style={styles.image}
+                                                    ></Image>
+                                                )}
+                                            </Container>
+                                            <Button
+                                                iconLeft
+                                                rounded
+                                                info
+                                                style={styles.buttons}
+                                                onPress={() => {
+                                                    updateImage();
+                                                }}
+                                            >
+                                                <Icon name="image" />
+                                                <Text>Add picture</Text>
+                                            </Button>
+                                        </>
+                                    )}
 
                                     {/* Update pin */}
                                     <Button
@@ -329,6 +269,7 @@ function EditPin(props) {
                                     <Button
                                         iconLeft
                                         rounded
+                                        warning
                                         style={styles.buttons}
                                         onPress={() => {
                                             closeModal();
@@ -378,7 +319,7 @@ const styles = StyleSheet.create({
         marginTop: 0,
     },
     modalView: {
-        flex: 1,
+        // flex: 1,
         flexDirection: "column",
         height: deviceHeight * 0.95,
         width: deviceWidth * 0.95,
@@ -424,7 +365,9 @@ const styles = StyleSheet.create({
     },
     tagText: {
         flex: 0.8,
+        fontSize: 17,
         height: 30,
+        marginLeft: 23,
         textAlign: "center",
     },
     tagButton: {
@@ -433,7 +376,7 @@ const styles = StyleSheet.create({
         width: 30,
         borderRadius: 20,
         padding: 0,
-        margin: 0,
+        marginRight: 5,
         justifyContent: "center",
         alignSelf: "center",
     },
@@ -474,6 +417,17 @@ const styles = StyleSheet.create({
         height: 50,
         width: 120,
         fontSize: 20,
+    },
+    addTagButton: {
+        flex: 0.2,
+        height: 30,
+        width: 30,
+        borderRadius: 20,
+        padding: 0,
+        marginRight: 5,
+        marginBottom: 20,
+        justifyContent: "center",
+        alignSelf: "center",
     },
     lowerParts: {
         justifyContent: "center",
