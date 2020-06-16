@@ -10,11 +10,10 @@ import * as Fetching from "../components/fetching";
 function YourAccount({ navigation }) {
     const [User, setUser] = useState("");
     let user = store.getCurrentUser;
-    console.log(user);
 
     function ListPin() {
         let pins = store.getMapPins;
-        // user = store.getCurrentUser;
+
         return pins.map((pin, index) => {
             if (pin.pinUser === user.userId) {
                 return <ListYourPins key={index} index={index} id={pin.pinTitle}></ListYourPins>;
@@ -25,7 +24,6 @@ function YourAccount({ navigation }) {
     }
 
     async function logout() {
-        // user = store.getCurrentUser;
         let message = await Fetching.logout(user.token);
         showToast(message.message);
         if (message.loggedOut === true) {
@@ -58,7 +56,12 @@ function YourAccount({ navigation }) {
                     </ImageBackground>
                 )}
             </Header>
-            <KeyboardAwareScrollView enableOnAndroid={true} keyboardShouldPersistTaps="always" style={styles.scroll}>
+            <KeyboardAwareScrollView
+                enableOnAndroid={true}
+                keyboardShouldPersistTaps="always"
+                style={styles.scroll}
+                persistentScrollbar={true}
+            >
                 {ListPin()}
             </KeyboardAwareScrollView>
             <Container style={styles.container}>
@@ -93,7 +96,7 @@ const styles = StyleSheet.create({
         padding: 10,
         margin: 0,
         borderRadius: 20,
-        backgroundColor: "rgba(255, 255, 255, 0.3)",
+        backgroundColor: "rgba(255, 255, 255, 0.4)",
         left: 10,
     },
     image: {

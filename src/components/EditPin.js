@@ -99,6 +99,7 @@ function EditPin(props) {
                 <Icon name="menu" />
                 <Text>Edit pin</Text>
             </Button>
+
             <Content keyboardShouldPersistTaps="never">
                 <Modal animationType="slide" transparent={true} visible={openModalVisible} style={styles.modal}>
                     <View style={styles.centeredView}>
@@ -260,7 +261,7 @@ function EditPin(props) {
                                     }}
                                 >
                                     <Icon name="arrow-back" />
-                                    <Text>Discard changes and close</Text>
+                                    <Text>Discard and close</Text>
                                 </Button>
                                 {/* Delete pin  */}
                                 <Button
@@ -289,11 +290,11 @@ const deviceHeight = Dimensions.get("window").height;
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 0.4,
         backgroundColor: "#FCBF49",
         alignItems: "center",
         justifyContent: "center",
-        height: 50,
+        height: 20,
     },
     centeredView: {
         flex: 1,
@@ -425,13 +426,14 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         flex: 1,
-        height: 180,
-        width: 180,
+        height: deviceHeight * 0.2,
+        width: deviceWidth * 0.4,
+        backgroundColor: "#FFF9C4",
     },
     image: {
         flex: 1,
-        height: 200, // Kolla detta
-        width: 200,
+        height: deviceHeight * 0.2,
+        width: deviceWidth * 0.4,
         resizeMode: "contain",
         justifyContent: "center",
         alignSelf: "center",
@@ -442,10 +444,14 @@ const styles = StyleSheet.create({
         flex: 0.8,
         justifyContent: "center",
         alignSelf: "center",
-        width: 300,
+        width: deviceWidth * 0.7,
     },
     button: {
+        width: deviceWidth * 0.5,
+        height: deviceHeight * 0.035,
         backgroundColor: "#1976D2",
+        justifyContent: "center",
+        alignSelf: "center",
     },
 });
 

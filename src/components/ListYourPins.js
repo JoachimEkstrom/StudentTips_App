@@ -23,10 +23,13 @@ const styles = StyleSheet.create({
         backgroundColor: "#FCBF49",
         alignItems: "center",
         justifyContent: "center",
-        height: deviceHeight * 0.105,
+        height: deviceHeight * 0.12,
     },
     text: {
+        flex: 0.4,
         fontSize: 20,
+        margin: 10,
+        padding: 0,
     },
 });
 
